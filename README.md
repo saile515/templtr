@@ -51,6 +51,7 @@
 ```
 
 After build:
+
 `/out/test-page/page_1/index.html`
 ```html
 <html lang="en">
