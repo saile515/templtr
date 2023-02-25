@@ -7,22 +7,18 @@
 #include <json/json.h>
 #include <fmt/core.h>
 
-void wrong_input()
-{
+void wrong_input() {
     fmt::print("\nPlease specify a command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
 }
 
-int init()
-{
+int init() {
     fmt::print("Initializing project...\n");
 
-    if (!std::filesystem::exists("pages"))
-    {
+    if (!std::filesystem::exists("pages")) {
         std::filesystem::create_directory("pages");
     }
 
-    if (!std::filesystem::exists("content"))
-    {
+    if (!std::filesystem::exists("content")) {
         std::filesystem::create_directory("content");
     }
 
@@ -31,8 +27,7 @@ int init()
     return 0;
 }
 
-int build(const char *outdir)
-{
+int build(const char *outdir) {
     fmt::print("Started build...\n");
 
     std::chrono::time_point start_time = std::chrono::high_resolution_clock::now();
@@ -43,8 +38,8 @@ int build(const char *outdir)
     
     std::filesystem::create_directory(outdir);
 
-    for (const auto &page : std::filesystem::directory_iterator("content"))
-    {
+    // Iterate over template files
+    for (const auto &page : std::filesystem::directory_iterator("content")) {
         std::string page_name = page.path().stem().string();
         fmt::print("Building {}...\n", page_name);
 
@@ -53,6 +48,7 @@ int build(const char *outdir)
         std::string tmpl_path = fmt::format("pages/{}.html", page_name);
         std::string tmpl;
 
+        // Read template file
         if (std::filesystem::exists(tmpl_path)) {
             std::ifstream tmpl_file(tmpl_path, std::ifstream::binary);
             std::stringstream buffer;
@@ -66,10 +62,9 @@ int build(const char *outdir)
 
         std::string content_path = fmt::format("content/{}", page_name);
 
-        if (std::filesystem::exists(content_path))
-        {
-            for (const auto &entry : std::filesystem::directory_iterator(content_path))
-            {
+        // Iterate over dynamic pages
+        if (std::filesystem::exists(content_path)) {
+            for (const auto &entry : std::filesystem::directory_iterator(content_path)) {
                 std::string entry_filename = entry.path().string();
                 std::string entry_name = entry.path().stem().string();
 
@@ -79,11 +74,13 @@ int build(const char *outdir)
 
                 std::string built_page = tmpl;
 
+                // Iterate over keys
                 if (data.size() > 0) {
                     for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
                         std::string key = itr.name();
                         
                         if (itr->isString()) {
+                            // Handle values of type string
                             std::string value = itr->asString();
 
                             std::string regex = fmt::format("\\{{{}\\}}", key);
@@ -91,9 +88,11 @@ int build(const char *outdir)
                             built_page = std::regex_replace(built_page, std::regex(regex), value);
                         }
                         else if (itr->isArray()) {
+                            // Handle values of type array
                             std::string regex = fmt::format("\\[([^\\]]*\\{{{}\\}}[^\\]]*)\\]", key);
                             std::smatch match;
 
+                            // Iterate over array entires
                             while (std::regex_search(built_page, match, std::regex(regex))) {
                                 std::string array_item_template = match[1];
                                 std::string array_items;
@@ -114,8 +113,10 @@ int build(const char *outdir)
                     }
                 }
 
+                // Minify
                 built_page = std::regex_replace(built_page, std::regex("[\n\r\t]"), "");      
 
+                // Write to file
                 std::string out_dir = fmt::format("{}/{}/{}", outdir, page_name, entry_name);
                 std::filesystem::create_directory(out_dir);
                 std::ofstream out_file(fmt::format("{}/index.html", out_dir));
@@ -129,6 +130,7 @@ int build(const char *outdir)
         fmt::print("Finished building {}\n", page_name);
     }
 
+    // Calculate build duration
     std::chrono::time_point end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration build_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 
@@ -137,31 +139,26 @@ int build(const char *outdir)
     return 0;
 }
 
-int main(int argc, char **argv)
-{
-    if (argc == 1)
-    {
+int main(int argc, char **argv) {
+    if (argc == 1) {
         wrong_input();
         return -1;
     }
 
-    if (std::strcmp(argv[1], "init") == 0)
-    {
+    if (std::strcmp(argv[1], "init") == 0) {
         init();
     }
-    else if (std::strcmp(argv[1], "build") == 0)
-    {
-        if (argc == 3)
-        {
-            build(argv[2]);
+    else if (std::strcmp(argv[1], "build") == 0) {
+        if (argc == 3) {
+            if (build(argv[2]) < 0) {
+                fmt::print("Build failed!");
+            }
         }
-        else
-        {
+        else {
             wrong_input();
         }
     }
-    else
-    {
+    else {
         wrong_input();
         return -1;
     }
