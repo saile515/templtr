@@ -48,6 +48,8 @@ int build(const char *outdir)
         std::string page_name = page.path().stem().string();
         fmt::print("Building {}...\n", page_name);
 
+        std::filesystem::create_directory(fmt::format("{}/{}", outdir, page_name));
+
         std::string tmpl_path = fmt::format("pages/{}.html", page_name);
         std::string tmpl;
 
@@ -114,7 +116,7 @@ int build(const char *outdir)
 
                 built_page = std::regex_replace(built_page, std::regex("[\n\r\t]"), "");      
 
-                std::string out_dir = fmt::format("{}/{}", outdir, entry_name);
+                std::string out_dir = fmt::format("{}/{}/{}", outdir, page_name, entry_name);
                 std::filesystem::create_directory(out_dir);
                 std::ofstream out_file(fmt::format("{}/index.html", out_dir));
 

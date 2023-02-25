@@ -44,7 +44,7 @@
 ```
 
 After build:
-`/out/page_1/index.html`
+`/out/test-page/page_1/index.html`
 ```html
 <html lang="en">
 	<head>
