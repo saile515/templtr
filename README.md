@@ -1,6 +1,8 @@
 # templtr
 ## A lightweight framework for statically generating dynamic html pages, written in C++.
 
+*Caution: Project is still very early in development, so expect many new features and breaking api changes.*
+
 **templtr is:**
 * Lightweight
 * Easy to use
