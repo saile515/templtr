@@ -80,23 +80,39 @@ int build(const char *outdir)
                 if (data.size() > 0) {
                     for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
                         std::string key = itr.name();
-                        std::string value;
                         
                         if (itr->isString()) {
-                            value = itr->asString();
+                            std::string value = itr->asString();
+
+                            std::string regex = fmt::format("\\{{{}\\}}", key);
+
+                            built_page = std::regex_replace(built_page, std::regex(regex), value);
+                        }
+                        else if (itr->isArray()) {
+                            std::string regex = fmt::format("\\[([^\\]]*\\{{{}\\}}[^\\]]*)\\]", key);
+                            std::smatch match;
+
+                            while (std::regex_search(built_page, match, std::regex(regex))) {
+                                std::string array_item_template = match[1];
+                                std::string array_items;
+
+                                for (const auto& item : *itr) {
+                                    if (item.isString()) {
+                                        array_items += std::regex_replace(array_item_template, std::regex(fmt::format("\\{{{}\\}}", key)), item.asString());
+                                    }
+                                }
+
+                                built_page.replace(built_page.find(match[0].str()), array_item_template.size() + 2, array_items);
+                            }                            
                         }
                         else {
                             continue;
                         }
-                        // TODO: Add support for array and object type
-
-                        std::string regex = fmt::format("\\{{{}\\}}", key);
-
-                        built_page = std::regex_replace(built_page, std::regex(regex), value);
+                        // TODO: Add support for object type
                     }
                 }
 
-                built_page = std::regex_replace(built_page, std::regex("\n"), "");
+                built_page = std::regex_replace(built_page, std::regex("[\n\r\t]"), "");      
 
                 std::string out_dir = fmt::format("{}/{}", outdir, entry_name);
                 std::filesystem::create_directory(out_dir);
@@ -108,13 +124,13 @@ int build(const char *outdir)
             }
         }
 
-        fmt::print("Finished building {}!\n", page_name);
+        fmt::print("Finished building {}\n", page_name);
     }
 
     std::chrono::time_point end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration build_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 
-    fmt::print("Build finished in {} milliseconds!\n", build_time.count());
+    fmt::print("Build finished in {} milliseconds\n", build_time.count());
 
     return 0;
 }
