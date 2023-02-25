@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <chrono>
+#include <regex>
 #include <json/json.h>
 #include <fmt/core.h>
 
@@ -36,10 +37,30 @@ int build(const char *outdir)
 
     std::chrono::time_point start_time = std::chrono::high_resolution_clock::now();
 
+    if (std::filesystem::exists(outdir)) {
+        std::filesystem::remove_all(outdir);
+    }
+    
+    std::filesystem::create_directory(outdir);
+
     for (const auto &page : std::filesystem::directory_iterator("content"))
     {
         std::string page_name = page.path().stem().string();
         fmt::print("Building {}...\n", page_name);
+
+        std::string tmpl_path = fmt::format("pages/{}.html", page_name);
+        std::string tmpl;
+
+        if (std::filesystem::exists(tmpl_path)) {
+            std::ifstream tmpl_file(tmpl_path, std::ifstream::binary);
+            std::stringstream buffer;
+            buffer << tmpl_file.rdbuf();
+            tmpl = buffer.str();
+        }
+        else {
+            fmt::print("Error: No matching template for {}", page_name);
+            return -1;
+        }
 
         std::string content_path = fmt::format("content/{}", page_name);
 
@@ -54,6 +75,8 @@ int build(const char *outdir)
                 Json::Value data;
                 entry_file >> data;
 
+                std::string built_page = tmpl;
+
                 if (data.size() > 0) {
                     for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
                         std::string key = itr.name();
@@ -65,11 +88,23 @@ int build(const char *outdir)
                         else {
                             continue;
                         }
-                        // TODO: Add support for array and object types
+                        // TODO: Add support for array and object type
 
-                        fmt::print("{}: {}\n", key, value);
+                        std::string regex = fmt::format("\\{{{}\\}}", key);
+
+                        built_page = std::regex_replace(built_page, std::regex(regex), value);
                     }
                 }
+
+                built_page = std::regex_replace(built_page, std::regex("\n"), "");
+
+                std::string out_dir = fmt::format("{}/{}", outdir, entry_name);
+                std::filesystem::create_directory(out_dir);
+                std::ofstream out_file(fmt::format("{}/index.html", out_dir));
+
+                out_file << built_page;
+
+                out_file.close();
             }
         }
 
