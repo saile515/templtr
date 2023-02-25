@@ -53,6 +53,23 @@ int build(const char *outdir)
                 std::ifstream entry_file(entry_filename, std::ifstream::binary);
                 Json::Value data;
                 entry_file >> data;
+
+                if (data.size() > 0) {
+                    for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
+                        std::string key = itr.name();
+                        std::string value;
+                        
+                        if (itr->isString()) {
+                            value = itr->asString();
+                        }
+                        else {
+                            continue;
+                        }
+                        // TODO: Add support for array and object types
+
+                        fmt::print("{}: {}\n", key, value);
+                    }
+                }
             }
         }
 
