@@ -31,7 +31,10 @@
 		<title>Document</title>
 	</head>
 	<body>
-		{title}
+		<h1>{title}</h1>
+		<ul>
+			[<li>{list}</li>]
+		<ul>
 	</body>
 </html>
 ```
@@ -39,7 +42,11 @@
 `content/test-page/page_1.json`
 ```json
 {
-	"title": "Hello World"
+	"title": "Hello World",
+	"list": [
+		"List item 1",
+		"List item 2"
+	]
 }
 ```
 
@@ -54,7 +61,11 @@ After build:
 		<title>Document</title>
 	</head>
 	<body>
-		Hello World
+		<h1>Hello World<h1>
+		<ul>
+			<li>List item 1</li>
+			<li>List item 2</li>
+		</ul>
 	</body>
 </html>
 ```
