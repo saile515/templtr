@@ -1,13 +1,13 @@
 # templtr
-## A lightweight framework for statically generating dynamic html pages, written in C++.
+**templtr (pronounced templator) is a lightweight framework for statically generating dynamic html pages, written in C++.**
 
 *Caution: Project is still very early in development, so expect many new features and breaking api changes.*
 
-**templtr is:**
+### Features
 * Lightweight
 * Easy to use
 * Powerful
-* Very fast
+* Fast
 
 ### Installation:
 *Installation instructions coming soon.*
