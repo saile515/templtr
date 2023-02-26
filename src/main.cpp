@@ -22,13 +22,27 @@ std::string object_replace(std::string template_string, Json::Value::const_itera
 
 std::string array_replace(std::string template_string, Json::Value::const_iterator itr, std::string key) {
     std::string result_string = template_string;
-    std::regex regex(fmt::format("\\[([^\\]]*\\{{{}[^\\}}]*\\}}[^]*)\\]", key));
+    std::regex regex(fmt::format("\\[([^]*\\{{{}[^\\}}]*\\}}[^]*)\\]", key));
     std::smatch match;
 
     // Iterate over array occurrences
     while (std::regex_search(result_string, match, regex)) {
-        std::string array_item_template = match[1];
+        std::string orignal_string = match[0];
         std::string array_items;
+
+        // Temporary fix until I can get the regex working
+        int index = 0;
+        int lbrkt = 0;
+        int rbrkt = 0;
+        do {
+            if (orignal_string[index] == char(91)) ++lbrkt;
+            else if (orignal_string[index] == char(93)) ++rbrkt;
+            index++;
+        } while (lbrkt != rbrkt);
+
+        orignal_string.resize(index);
+
+        std::string array_item_template = orignal_string.substr(1, orignal_string.size() - 2);
 
         // Iterate over array entires
         for (Json::Value::const_iterator item = itr->begin(); item != itr->end(); item++) {
@@ -43,7 +57,7 @@ std::string array_replace(std::string template_string, Json::Value::const_iterat
             }
         }
 
-        result_string.replace(result_string.find(match[0].str()), match[0].str().size(), array_items);
+        result_string.replace(result_string.find(orignal_string), orignal_string.size(), array_items);
     }
 
     return result_string;
