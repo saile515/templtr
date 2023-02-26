@@ -11,6 +11,11 @@ void wrong_input() {
     fmt::print("\nPlease specify a command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
 }
 
+std::string string_replace(std::string template_string, std::string key, std::string value) {
+    std::regex regex(fmt::format("\\{{{}\\}}", key));
+    return std::regex_replace(template_string, regex, value);
+}
+
 int init() {
     fmt::print("Initializing project...\n");
 
@@ -83,9 +88,7 @@ int build(const char *outdir) {
                             // Handle values of type string
                             std::string value = itr->asString();
 
-                            std::string regex = fmt::format("\\{{{}\\}}", key);
-
-                            built_page = std::regex_replace(built_page, std::regex(regex), value);
+                            built_page = string_replace(built_page, key, value);
                         }
                         else if (itr->isArray()) {
                             // Handle values of type array
@@ -99,12 +102,21 @@ int build(const char *outdir) {
 
                                 for (const auto& item : *itr) {
                                     if (item.isString()) {
-                                        array_items += std::regex_replace(array_item_template, std::regex(fmt::format("\\{{{}\\}}", key)), item.asString());
+                                        array_items += string_replace(array_item_template, itr.name(), item.asString());
                                     }
                                 }
 
                                 built_page.replace(built_page.find(match[0].str()), array_item_template.size() + 2, array_items);
                             }                            
+                        }
+                        else if (itr->isObject()) {
+                            for (Json::Value::const_iterator sub_key = itr->begin(); sub_key != itr->end(); sub_key++) {
+                                if (sub_key->isString()) {
+                                    std::string regex = fmt::format("\\{{{}\\.{}\\}}", key, sub_key.name());
+
+                                    built_page = std::regex_replace(built_page, std::regex(regex), sub_key->asString());
+                                }
+                            }
                         }
                         else {
                             continue;

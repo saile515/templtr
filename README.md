@@ -34,7 +34,11 @@
 		<h1>{title}</h1>
 		<ul>
 			[<li>{list}</li>]
-		<ul>
+		</ul>
+		<article>
+			<h2>{article.title}</h2>
+			<p>{article.body}</p>
+		</article>
 	</body>
 </html>
 ```
@@ -46,7 +50,11 @@
 	"list": [
 		"List item 1",
 		"List item 2"
-	]
+	],
+	"article": {
+		"title": "This is an article",
+		"body": "Lorem ipsum dolor sit amet."
+	}
 }
 ```
 
@@ -61,11 +69,15 @@ After build:
 		<title>Document</title>
 	</head>
 	<body>
-		<h1>Hello World<h1>
+		<h1>Hello World</h1>
 		<ul>
 			<li>List item 1</li>
 			<li>List item 2</li>
 		</ul>
+		<article>
+			<h2>This is an article</h2>
+			<p>Lorem ipsum dolor sit amet.</p>
+		</article>
 	</body>
 </html>
 ```
