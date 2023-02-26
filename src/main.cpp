@@ -11,9 +11,62 @@ void wrong_input() {
     fmt::print("\nPlease specify a command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
 }
 
-std::string string_replace(std::string template_string, std::string key, std::string value) {
+std::string string_replace(std::string template_string, Json::Value::const_iterator itr, std::string key) {
+    std::string value = itr->asString();
+
     std::regex regex(fmt::format("\\{{{}\\}}", key));
     return std::regex_replace(template_string, regex, value);
+}
+
+std::string object_replace(std::string template_string, Json::Value::const_iterator itr, std::string key);
+
+std::string array_replace(std::string template_string, Json::Value::const_iterator itr, std::string key) {
+    std::string result_string = template_string;
+    std::regex regex(fmt::format("\\[([^\\]]*\\{{{}[^\\}}]*\\}}[^]*)\\]", key));
+    std::smatch match;
+
+    // Iterate over array occurrences
+    while (std::regex_search(result_string, match, regex)) {
+        std::string array_item_template = match[1];
+        std::string array_items;
+
+        // Iterate over array entires
+        for (Json::Value::const_iterator item = itr->begin(); item != itr->end(); item++) {
+            if (item->isString()) {
+                array_items += string_replace(array_item_template, item, key);
+            }
+            else if (item->isArray()) {
+                array_items += array_replace(array_item_template, item, key);
+            }
+            else if (item->isObject()) {
+                array_items += object_replace(array_item_template, item, key);
+            }
+        }
+
+        result_string.replace(result_string.find(match[0].str()), match[0].str().size(), array_items);
+    }
+
+    return result_string;
+}
+
+std::string object_replace(std::string template_string, Json::Value::const_iterator itr, std::string key) {
+    std::string result_string = template_string;
+
+    for (Json::Value::const_iterator sub_key = itr->begin(); sub_key != itr->end(); sub_key++) {
+        if (sub_key->isString()) {
+            std::string regex = fmt::format("\\{{{}\\.{}\\}}", key, sub_key.name());
+
+            result_string = std::regex_replace(result_string, std::regex(regex), sub_key->asString());
+        }
+        else if (sub_key->isArray()) {
+            result_string = array_replace(result_string, sub_key, fmt::format("{}.{}", key, sub_key.name()));
+        }
+        else if (sub_key->isObject()) {
+            result_string = object_replace(result_string, sub_key, fmt::format("{}.{}", key, sub_key.name()));
+        }
+    }
+
+    return result_string;
 }
 
 int init() {
@@ -59,6 +112,8 @@ int build(const char *outdir) {
             std::stringstream buffer;
             buffer << tmpl_file.rdbuf();
             tmpl = buffer.str();
+            // Minify
+            tmpl = std::regex_replace(tmpl, std::regex("[\n\r\t]"), "");
         }
         else {
             fmt::print("Error: No matching template for {}", page_name);
@@ -85,48 +140,20 @@ int build(const char *outdir) {
                         std::string key = itr.name();
                         
                         if (itr->isString()) {
-                            // Handle values of type string
-                            std::string value = itr->asString();
-
-                            built_page = string_replace(built_page, key, value);
+                            built_page = string_replace(built_page, itr, key);
                         }
                         else if (itr->isArray()) {
-                            // Handle values of type array
-                            std::string regex = fmt::format("\\[([^\\]]*\\{{{}\\}}[^\\]]*)\\]", key);
-                            std::smatch match;
-
-                            // Iterate over array entires
-                            while (std::regex_search(built_page, match, std::regex(regex))) {
-                                std::string array_item_template = match[1];
-                                std::string array_items;
-
-                                for (const auto& item : *itr) {
-                                    if (item.isString()) {
-                                        array_items += string_replace(array_item_template, itr.name(), item.asString());
-                                    }
-                                }
-
-                                built_page.replace(built_page.find(match[0].str()), array_item_template.size() + 2, array_items);
-                            }                            
+                            built_page = array_replace(built_page, itr, key);
                         }
                         else if (itr->isObject()) {
-                            for (Json::Value::const_iterator sub_key = itr->begin(); sub_key != itr->end(); sub_key++) {
-                                if (sub_key->isString()) {
-                                    std::string regex = fmt::format("\\{{{}\\.{}\\}}", key, sub_key.name());
-
-                                    built_page = std::regex_replace(built_page, std::regex(regex), sub_key->asString());
-                                }
-                            }
+                            built_page = object_replace(built_page, itr, key);
                         }
                         else {
                             continue;
                         }
                         // TODO: Add support for object type
                     }
-                }
-
-                // Minify
-                built_page = std::regex_replace(built_page, std::regex("[\n\r\t]"), "");      
+                }    
 
                 // Write to file
                 std::string out_dir = fmt::format("{}/{}/{}", outdir, page_name, entry_name);
