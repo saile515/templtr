@@ -1,5 +1,7 @@
 # templtr
+
 [![CMake](https://github.com/saile515/templtr/actions/workflows/cmake.yml/badge.svg?branch=master)](https://github.com/saile515/templtr/actions/workflows/cmake.yml)
+
 **templtr (pronounced templator) is a lightweight framework for statically generating dynamic html pages, written in C++.**
 
 *Caution: Project is still very early in development, so expect many new features and breaking api changes.*
