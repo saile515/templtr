@@ -1,26 +1,27 @@
-#include <string>
+#include <chrono>
 #include <filesystem>
+#include <fmt/core.h>
 #include <fstream>
 #include <iostream>
-#include <chrono>
-#include <regex>
 #include <json/json.h>
-#include <fmt/core.h>
+#include <regex>
+#include <string>
+#include <string_view>
 
-void wrong_input() {
+static void wrong_input() {
     fmt::print("\nPlease specify a command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
 }
 
-std::string string_replace(std::string template_string, Json::Value::const_iterator itr, std::string key) {
+static std::string string_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
     std::string value = itr->asString();
 
     std::regex regex(fmt::format("\\{{{}\\}}", key));
     return std::regex_replace(template_string, regex, value);
 }
 
-std::string object_replace(std::string template_string, Json::Value::const_iterator itr, std::string key);
+static std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key);
 
-std::string array_replace(std::string template_string, Json::Value::const_iterator itr, std::string key) {
+static std::string array_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
     std::string result_string = template_string;
     std::regex regex(fmt::format("\\[([^]*\\{{{}[^\\}}]*\\}}[^]*)\\]", key));
     std::smatch match;
@@ -31,7 +32,7 @@ std::string array_replace(std::string template_string, Json::Value::const_iterat
         std::string array_items;
 
         // Temporary fix until I can get the regex working
-        int index = 0;
+        size_t index = 0;
         int lbrkt = 0;
         int rbrkt = 0;
         do {
@@ -63,7 +64,7 @@ std::string array_replace(std::string template_string, Json::Value::const_iterat
     return result_string;
 }
 
-std::string object_replace(std::string template_string, Json::Value::const_iterator itr, std::string key) {
+static std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
     std::string result_string = template_string;
 
     for (Json::Value::const_iterator sub_key = itr->begin(); sub_key != itr->end(); sub_key++) {
@@ -83,7 +84,7 @@ std::string object_replace(std::string template_string, Json::Value::const_itera
     return result_string;
 }
 
-int init() {
+static int init() {
     fmt::print("Initializing project...\n");
 
     if (!std::filesystem::exists("pages")) {
@@ -99,7 +100,7 @@ int init() {
     return 0;
 }
 
-int build(const char *outdir) {
+static int build(std::string_view outdir) {
     fmt::print("Started build...\n");
 
     std::chrono::time_point start_time = std::chrono::high_resolution_clock::now();
