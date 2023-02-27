@@ -7,6 +7,7 @@
 #include <regex>
 #include <string>
 #include <string_view>
+#include <vector>
 
 static void wrong_input() {
     fmt::print("\nPlease specify a command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
@@ -111,6 +112,20 @@ static int build(std::string_view outdir) {
     
     std::filesystem::create_directory(outdir);
 
+    std::vector<std::tuple<std::string, std::string>> components;
+
+    for (const auto& component : std::filesystem::directory_iterator("components")) {
+        std::string component_name = component.path().stem().string();
+
+        std::ifstream component_file(component.path(), std::ifstream::binary);
+        std::stringstream buffer;
+        buffer << component_file.rdbuf();
+        std::string component_tmpl = buffer.str();
+        // Minify
+        component_tmpl = std::regex_replace(component_tmpl, std::regex("[\n\r\t]"), "");
+        components.push_back({ component_name, component_tmpl });
+    }
+
     // Iterate over template files
     for (const auto &page : std::filesystem::directory_iterator("content")) {
         std::string page_name = page.path().stem().string();
@@ -133,6 +148,10 @@ static int build(std::string_view outdir) {
         else {
             fmt::print("Error: No matching template for {}", page_name);
             return -1;
+        }
+
+        for (const auto& component : components) {
+            tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
         }
 
         std::string content_path = fmt::format("content/{}", page_name);
