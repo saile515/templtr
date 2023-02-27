@@ -92,6 +92,10 @@ static int init() {
         std::filesystem::create_directory("pages");
     }
 
+    if (!std::filesystem::exists("components")) {
+        std::filesystem::create_directory("components");
+    }
+
     if (!std::filesystem::exists("content")) {
         std::filesystem::create_directory("content");
     }
