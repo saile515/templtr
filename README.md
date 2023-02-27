@@ -3,23 +3,29 @@
 
 *Caution: Project is still very early in development, so expect many new features and breaking api changes.*
 
-### Features:
+## Features:
 * Lightweight
 * Easy to use
 * Powerful
 * Fast
 
-### Installation:
-*Installation instructions coming soon.*
+## Installation:
+### Option 1: Use prebuilt binaries
+* Download and extract the latest release.
+* Add to path. (optional)
+### Option 2: Build from source
+* Download and extract source from the latest release.
+* Run `/usr/local/bin/cmake --build /path/to/source/build --config Release --target all --`
+* Add to path. (optional)
 
-### Usage:
+## Usage:
 * Run `templtr init` to create a templtr project.
 * Create template files in `/pages`, template files are like normal html files, but with curly brackets surrounding dynamic content.
 * Create a directory in `/content` with the same name as the template (without .html).
 * Fill the directory with a `.json` file for each page. The filename will be the slug when built.
 * Run `templtr build <outdir>` to build the html files.
 
-### Example:
+## Example:
 `pages/test-page.html`
 ```html
 <html lang="en">
