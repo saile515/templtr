@@ -9,18 +9,21 @@
 #include <string_view>
 #include <vector>
 
-static void wrong_input() {
+static void wrong_input()
+{
     fmt::print("\nPlease specify a command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
 }
 
-static std::string string_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
+static std::string string_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+{
     std::string value = itr->asString();
 
     std::regex regex(fmt::format("\\{{{}\\}}", key));
     return std::regex_replace(template_string, regex, value);
 }
 
-static std::string int_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
+static std::string int_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+{
     std::string value = std::to_string(itr->asInt());
 
     std::regex regex(fmt::format("\\{{{}\\}}", key));
@@ -29,7 +32,8 @@ static std::string int_replace(const std::string& template_string, Json::Value::
 
 static std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key);
 
-static std::string array_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
+static std::string array_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+{
     std::string result_string = template_string;
     std::regex regex(fmt::format("\\[([^]*\\{{{}[^\\}}]*\\}}[^]*)\\]", key));
     std::smatch match;
@@ -44,8 +48,10 @@ static std::string array_replace(const std::string& template_string, Json::Value
         int lbrkt = 0;
         int rbrkt = 0;
         do {
-            if (orignal_string[index] == char(91)) ++lbrkt;
-            else if (orignal_string[index] == char(93)) ++rbrkt;
+            if (orignal_string[index] == char(91))
+                ++lbrkt;
+            else if (orignal_string[index] == char(93))
+                ++rbrkt;
             index++;
         } while (lbrkt != rbrkt);
 
@@ -57,14 +63,11 @@ static std::string array_replace(const std::string& template_string, Json::Value
         for (Json::Value::const_iterator item = itr->begin(); item != itr->end(); item++) {
             if (item->isString()) {
                 array_items += string_replace(array_item_template, item, key);
-            }
-            else if (item->isArray()) {
+            } else if (item->isArray()) {
                 array_items += array_replace(array_item_template, item, key);
-            }
-            else if (item->isObject()) {
+            } else if (item->isObject()) {
                 array_items += object_replace(array_item_template, item, key);
-            } 
-            else if (item->isInt()) {
+            } else if (item->isInt()) {
                 array_items += int_replace(array_item_template, item, key);
             }
         }
@@ -75,7 +78,8 @@ static std::string array_replace(const std::string& template_string, Json::Value
     return result_string;
 }
 
-static std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
+static std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+{
     std::string result_string = template_string;
 
     for (Json::Value::const_iterator sub_key = itr->begin(); sub_key != itr->end(); sub_key++) {
@@ -83,22 +87,20 @@ static std::string object_replace(const std::string& template_string, Json::Valu
 
         if (sub_key->isString()) {
             result_string = string_replace(result_string, sub_key, final_key);
-        }
-        else if (sub_key->isArray()) {
+        } else if (sub_key->isArray()) {
             result_string = array_replace(result_string, sub_key, final_key);
-        }
-        else if (sub_key->isObject()) {
+        } else if (sub_key->isObject()) {
             result_string = object_replace(result_string, sub_key, final_key);
-        } 
-        else if (sub_key->isInt()) {
-            result_string += int_replace(result_string, sub_key, final_key);
+        } else if (sub_key->isInt()) {
+            result_string = int_replace(result_string, sub_key, final_key);
         }
     }
 
     return result_string;
 }
 
-static int init() {
+static int init()
+{
     fmt::print("Initializing project...\n");
 
     if (!std::filesystem::exists("pages")) {
@@ -118,7 +120,8 @@ static int init() {
     return 0;
 }
 
-static std::string read_template_file(std::string tmpl_path) {
+static std::string read_template_file(std::string tmpl_path)
+{
     if (std::filesystem::exists(tmpl_path)) {
         std::ifstream tmpl_file(tmpl_path, std::ifstream::binary);
         std::stringstream buffer;
@@ -132,7 +135,8 @@ static std::string read_template_file(std::string tmpl_path) {
     }
 }
 
-static int build(std::string_view outdir) {
+static int build(std::string_view outdir)
+{
     fmt::print("Started build...\n");
 
     std::chrono::time_point start_time = std::chrono::high_resolution_clock::now();
@@ -140,25 +144,21 @@ static int build(std::string_view outdir) {
     if (std::filesystem::exists(outdir)) {
         std::filesystem::remove_all(outdir);
     }
-    
+
     std::filesystem::create_directory(outdir);
 
     std::vector<std::tuple<std::string, std::string>> components;
 
     for (const auto& component : std::filesystem::directory_iterator("components")) {
         std::string component_name = component.path().stem().string();
+        std::string component_path = component.path().string();
 
-        std::ifstream component_file(component.path(), std::ifstream::binary);
-        std::stringstream buffer;
-        buffer << component_file.rdbuf();
-        std::string component_tmpl = buffer.str();
-        // Minify
-        component_tmpl = std::regex_replace(component_tmpl, std::regex("[\n\r\t]"), "");
+        std::string component_tmpl = read_template_file(component_path);
         components.push_back({ component_name, component_tmpl });
     }
 
-    // Iterate over template files
-    for (const auto &page : std::filesystem::directory_iterator("content")) {
+    // Iterate over content files
+    for (const auto& page : std::filesystem::directory_iterator("content")) {
         std::string page_name = page.path().stem().string();
         std::string page_path = page.path().string();
         fmt::print("Building {}...\n", page_name);
@@ -176,10 +176,11 @@ static int build(std::string_view outdir) {
                 return -1;
             }
 
+            // Populate components
             for (const auto& component : components) {
                 tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
             }
-            
+
             std::ifstream entry_file(page_path, std::ifstream::binary);
             Json::Value data;
             entry_file >> data;
@@ -190,21 +191,20 @@ static int build(std::string_view outdir) {
             if (data.size() > 0) {
                 for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
                     std::string key = itr.name();
-                    
+
                     if (itr->isString()) {
                         built_page = string_replace(built_page, itr, key);
-                    }
-                    else if (itr->isArray()) {
+                    } else if (itr->isArray()) {
                         built_page = array_replace(built_page, itr, key);
-                    }
-                    else if (itr->isObject()) {
+                    } else if (itr->isObject()) {
                         built_page = object_replace(built_page, itr, key);
-                    }
-                    else {
+                    } else if (itr->isInt()) {
+                        built_page = int_replace(built_page, itr, key);
+                    } else {
                         continue;
                     }
                 }
-            }    
+            }
 
             // Write to file
             std::string out_dir = fmt::format("{}/{}", outdir, page_name);
@@ -227,7 +227,12 @@ static int build(std::string_view outdir) {
                 return -1;
             }
 
-            for (const auto &entry : std::filesystem::directory_iterator(page_path)) {
+            // Populate components
+            for (const auto& component : components) {
+                tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
+            }
+
+            for (const auto& entry : std::filesystem::directory_iterator(page_path)) {
                 std::string entry_filename = entry.path().string();
                 std::string entry_name = entry.path().stem().string();
 
@@ -241,21 +246,20 @@ static int build(std::string_view outdir) {
                 if (data.size() > 0) {
                     for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
                         std::string key = itr.name();
-                        
+
                         if (itr->isString()) {
                             built_page = string_replace(built_page, itr, key);
-                        }
-                        else if (itr->isArray()) {
+                        } else if (itr->isArray()) {
                             built_page = array_replace(built_page, itr, key);
-                        }
-                        else if (itr->isObject()) {
+                        } else if (itr->isObject()) {
                             built_page = object_replace(built_page, itr, key);
-                        }
-                        else {
+                        } else if (itr->isInt()) {
+                            built_page = int_replace(built_page, itr, key);
+                        } else {
                             continue;
                         }
                     }
-                }    
+                }
 
                 // Write to file
                 std::string out_dir = fmt::format("{}/{}/{}", outdir, page_name, entry_name);
@@ -280,7 +284,8 @@ static int build(std::string_view outdir) {
     return 0;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
     if (argc == 1) {
         wrong_input();
         return -1;
@@ -288,18 +293,15 @@ int main(int argc, char **argv) {
 
     if (std::strcmp(argv[1], "init") == 0) {
         init();
-    }
-    else if (std::strcmp(argv[1], "build") == 0) {
+    } else if (std::strcmp(argv[1], "build") == 0) {
         if (argc == 3) {
             if (build(argv[2]) < 0) {
                 fmt::print("Build failed!");
             }
-        }
-        else {
+        } else {
             wrong_input();
         }
-    }
-    else {
+    } else {
         wrong_input();
         return -1;
     }
