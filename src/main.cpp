@@ -20,6 +20,13 @@ static std::string string_replace(const std::string& template_string, Json::Valu
     return std::regex_replace(template_string, regex, value);
 }
 
+static std::string int_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
+    std::string value = std::to_string(itr->asInt());
+
+    std::regex regex(fmt::format("\\{{{}\\}}", key));
+    return std::regex_replace(template_string, regex, value);
+}
+
 static std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key);
 
 static std::string array_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key) {
@@ -56,6 +63,9 @@ static std::string array_replace(const std::string& template_string, Json::Value
             }
             else if (item->isObject()) {
                 array_items += object_replace(array_item_template, item, key);
+            } 
+            else if (item->isInt()) {
+                array_items += int_replace(array_item_template, item, key);
             }
         }
 
@@ -69,16 +79,19 @@ static std::string object_replace(const std::string& template_string, Json::Valu
     std::string result_string = template_string;
 
     for (Json::Value::const_iterator sub_key = itr->begin(); sub_key != itr->end(); sub_key++) {
-        if (sub_key->isString()) {
-            std::string regex = fmt::format("\\{{{}\\.{}\\}}", key, sub_key.name());
+        std::string final_key = fmt::format("{}.{}", key, sub_key.name());
 
-            result_string = std::regex_replace(result_string, std::regex(regex), sub_key->asString());
+        if (sub_key->isString()) {
+            result_string = string_replace(result_string, sub_key, final_key);
         }
         else if (sub_key->isArray()) {
-            result_string = array_replace(result_string, sub_key, fmt::format("{}.{}", key, sub_key.name()));
+            result_string = array_replace(result_string, sub_key, final_key);
         }
         else if (sub_key->isObject()) {
-            result_string = object_replace(result_string, sub_key, fmt::format("{}.{}", key, sub_key.name()));
+            result_string = object_replace(result_string, sub_key, final_key);
+        } 
+        else if (sub_key->isInt()) {
+            result_string += int_replace(result_string, sub_key, final_key);
         }
     }
 
