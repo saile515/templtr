@@ -30,6 +30,34 @@ static std::string int_replace(const std::string& template_string, Json::Value::
     return std::regex_replace(template_string, regex, value);
 }
 
+static std::string float_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+{
+    std::string value = std::to_string(itr->asFloat());
+
+    std::regex regex(fmt::format("\\{{{}\\}}", key));
+    return std::regex_replace(template_string, regex, value);
+}
+
+static std::string bool_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+{
+    bool raw_value = itr->asBool();
+    std::string value;
+
+    if (raw_value)
+        value = "True";
+    else
+        value = "False";
+
+    std::regex regex(fmt::format("\\{{{}\\}}", key));
+    return std::regex_replace(template_string, regex, value);
+}
+
+static std::string null_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+{
+    std::regex regex(fmt::format("\\{{{}\\}}", key));
+    return std::regex_replace(template_string, regex, "");
+}
+
 static std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key);
 
 static std::string array_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
@@ -63,12 +91,18 @@ static std::string array_replace(const std::string& template_string, Json::Value
         for (Json::Value::const_iterator item = itr->begin(); item != itr->end(); item++) {
             if (item->isString()) {
                 array_items += string_replace(array_item_template, item, key);
+            } else if (item->isInt()) {
+                array_items += int_replace(array_item_template, item, key);
+            } else if (item->isDouble()) {
+                array_items += float_replace(array_item_template, item, key);
+            } else if (item->isBool()) {
+                array_items += bool_replace(array_item_template, item, key);
+            } else if (item->isNull()) {
+                array_items += null_replace(array_item_template, item, key);
             } else if (item->isArray()) {
                 array_items += array_replace(array_item_template, item, key);
             } else if (item->isObject()) {
                 array_items += object_replace(array_item_template, item, key);
-            } else if (item->isInt()) {
-                array_items += int_replace(array_item_template, item, key);
             }
         }
 
@@ -87,12 +121,18 @@ static std::string object_replace(const std::string& template_string, Json::Valu
 
         if (sub_key->isString()) {
             result_string = string_replace(result_string, sub_key, final_key);
+        } else if (sub_key->isInt()) {
+            result_string = int_replace(result_string, sub_key, final_key);
+        } else if (sub_key->isDouble()) {
+            result_string = float_replace(result_string, sub_key, final_key);
+        } else if (sub_key->isBool()) {
+            result_string = bool_replace(result_string, sub_key, final_key);
+        } else if (sub_key->isNull()) {
+            result_string = null_replace(result_string, sub_key, final_key);
         } else if (sub_key->isArray()) {
             result_string = array_replace(result_string, sub_key, final_key);
         } else if (sub_key->isObject()) {
             result_string = object_replace(result_string, sub_key, final_key);
-        } else if (sub_key->isInt()) {
-            result_string = int_replace(result_string, sub_key, final_key);
         }
     }
 
@@ -194,12 +234,18 @@ static int build(std::string_view outdir)
 
                     if (itr->isString()) {
                         built_page = string_replace(built_page, itr, key);
+                    } else if (itr->isInt()) {
+                        built_page = int_replace(built_page, itr, key);
+                    } else if (itr->isDouble()) {
+                        built_page = float_replace(built_page, itr, key);
+                    } else if (itr->isBool()) {
+                        built_page = bool_replace(built_page, itr, key);
+                    } else if (itr->isNull()) {
+                        built_page = null_replace(built_page, itr, key);
                     } else if (itr->isArray()) {
                         built_page = array_replace(built_page, itr, key);
                     } else if (itr->isObject()) {
                         built_page = object_replace(built_page, itr, key);
-                    } else if (itr->isInt()) {
-                        built_page = int_replace(built_page, itr, key);
                     } else {
                         continue;
                     }
@@ -249,12 +295,18 @@ static int build(std::string_view outdir)
 
                         if (itr->isString()) {
                             built_page = string_replace(built_page, itr, key);
+                        } else if (itr->isInt()) {
+                            built_page = int_replace(built_page, itr, key);
+                        } else if (itr->isDouble()) {
+                            built_page = float_replace(built_page, itr, key);
+                        } else if (itr->isBool()) {
+                            built_page = bool_replace(built_page, itr, key);
+                        } else if (itr->isNull()) {
+                            built_page = null_replace(built_page, itr, key);
                         } else if (itr->isArray()) {
                             built_page = array_replace(built_page, itr, key);
                         } else if (itr->isObject()) {
                             built_page = object_replace(built_page, itr, key);
-                        } else if (itr->isInt()) {
-                            built_page = int_replace(built_page, itr, key);
                         } else {
                             continue;
                         }
