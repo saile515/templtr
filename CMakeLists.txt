@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-if(WIN32)
-    set(VCPKG_TARGET_TRIPLET "x64-windows-static")
+if (WIN32)
+    if (CMAKE_CXX_COMPILER MATCHES "g\\+\\+.exe")
+        set(VCPKG_TARGET_TRIPLET "x64-mingw-static")
+    elseif(CMAKE_CXX_COMPILER MATCHES "cl.exe")
+        set(VCPKG_TARGET_TRIPLET "x64-windows-static")
+    endif()
 endif()
 
 include(cmake/Vcpkg.cmake) # needs to happen before project()
