@@ -105,6 +105,20 @@ static int init() {
     return 0;
 }
 
+static std::string read_template_file(std::string tmpl_path) {
+    if (std::filesystem::exists(tmpl_path)) {
+        std::ifstream tmpl_file(tmpl_path, std::ifstream::binary);
+        std::stringstream buffer;
+        buffer << tmpl_file.rdbuf();
+        std::string tmpl = buffer.str();
+        // Minify
+        tmpl = std::regex_replace(tmpl, std::regex("[\n\r\t]"), "");
+        return tmpl;
+    } else {
+        return "";
+    }
+}
+
 static int build(std::string_view outdir) {
     fmt::print("Started build...\n");
 
@@ -133,36 +147,74 @@ static int build(std::string_view outdir) {
     // Iterate over template files
     for (const auto &page : std::filesystem::directory_iterator("content")) {
         std::string page_name = page.path().stem().string();
+        std::string page_path = page.path().string();
         fmt::print("Building {}...\n", page_name);
 
         std::filesystem::create_directory(fmt::format("{}/{}", outdir, page_name));
 
-        std::string tmpl_path = fmt::format("pages/{}.html", page_name);
-        std::string tmpl;
+        // Iterate over static pages
+        if (std::filesystem::is_regular_file(page_path)) {
+            std::string tmpl_path = fmt::format("pages/{}.html", page_name);
 
-        // Read template file
-        if (std::filesystem::exists(tmpl_path)) {
-            std::ifstream tmpl_file(tmpl_path, std::ifstream::binary);
-            std::stringstream buffer;
-            buffer << tmpl_file.rdbuf();
-            tmpl = buffer.str();
-            // Minify
-            tmpl = std::regex_replace(tmpl, std::regex("[\n\r\t]"), "");
-        }
-        else {
-            fmt::print("Error: No matching template for {}", page_name);
-            return -1;
-        }
+            // Read template file
+            std::string tmpl = read_template_file(tmpl_path);
+            if (tmpl == "") {
+                fmt::print("Error: No matching template for {}", page_name);
+                return -1;
+            }
 
-        for (const auto& component : components) {
-            tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
-        }
+            for (const auto& component : components) {
+                tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
+            }
+            
+            std::ifstream entry_file(page_path, std::ifstream::binary);
+            Json::Value data;
+            entry_file >> data;
 
-        std::string content_path = fmt::format("content/{}", page_name);
+            std::string built_page = tmpl;
+
+            // Iterate over keys
+            if (data.size() > 0) {
+                for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
+                    std::string key = itr.name();
+                    
+                    if (itr->isString()) {
+                        built_page = string_replace(built_page, itr, key);
+                    }
+                    else if (itr->isArray()) {
+                        built_page = array_replace(built_page, itr, key);
+                    }
+                    else if (itr->isObject()) {
+                        built_page = object_replace(built_page, itr, key);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+            }    
+
+            // Write to file
+            std::string out_dir = fmt::format("{}/{}", outdir, page_name);
+            std::filesystem::create_directory(out_dir);
+            std::ofstream out_file(fmt::format("{}/index.html", out_dir));
+
+            out_file << built_page;
+
+            out_file.close();
+        }
 
         // Iterate over dynamic pages
-        if (std::filesystem::exists(content_path)) {
-            for (const auto &entry : std::filesystem::directory_iterator(content_path)) {
+        if (std::filesystem::is_directory(page_path)) {
+            std::string tmpl_path = fmt::format("pages/[{}].html", page_name);
+
+            // Read template file
+            std::string tmpl = read_template_file(tmpl_path);
+            if (tmpl == "") {
+                fmt::print("Error: No matching template for {}", page_name);
+                return -1;
+            }
+
+            for (const auto &entry : std::filesystem::directory_iterator(page_path)) {
                 std::string entry_filename = entry.path().string();
                 std::string entry_name = entry.path().stem().string();
 
@@ -189,7 +241,6 @@ static int build(std::string_view outdir) {
                         else {
                             continue;
                         }
-                        // TODO: Add support for object type
                     }
                 }    
 
