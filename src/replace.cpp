@@ -1,9 +1,9 @@
 #include "replace.h"
 
+#include <fmt/core.h>
 #include <regex>
-#include <string>
 
-static std::string string_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+std::string string_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     std::string value = itr->asString();
 
@@ -11,7 +11,7 @@ static std::string string_replace(const std::string& template_string, Json::Valu
     return std::regex_replace(template_string, regex, value);
 }
 
-static std::string int_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+std::string int_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     std::string value = std::to_string(itr->asInt());
 
@@ -19,7 +19,7 @@ static std::string int_replace(const std::string& template_string, Json::Value::
     return std::regex_replace(template_string, regex, value);
 }
 
-static std::string float_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+std::string float_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     std::string value = std::to_string(itr->asFloat());
 
@@ -27,7 +27,7 @@ static std::string float_replace(const std::string& template_string, Json::Value
     return std::regex_replace(template_string, regex, value);
 }
 
-static std::string bool_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+std::string bool_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     bool raw_value = itr->asBool();
     std::string value;
@@ -41,13 +41,15 @@ static std::string bool_replace(const std::string& template_string, Json::Value:
     return std::regex_replace(template_string, regex, value);
 }
 
-static std::string null_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+// This gives a compiler warning for unused parameter.
+// This is needed to create consistency with the other replace functions.
+std::string null_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     std::regex regex(fmt::format("\\{{{}\\}}", key));
     return std::regex_replace(template_string, regex, "");
 }
 
-static std::string array_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+std::string array_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     std::string result_string = template_string;
     std::regex regex(fmt::format("\\[([^]*\\{{{}[^\\}}]*\\}}[^]*)\\]", key));
@@ -85,7 +87,7 @@ static std::string array_replace(const std::string& template_string, Json::Value
     return result_string;
 }
 
-static std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+std::string object_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     std::string result_string = template_string;
 
@@ -98,7 +100,7 @@ static std::string object_replace(const std::string& template_string, Json::Valu
     return result_string;
 }
 
-static std::string replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
+std::string replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     if (itr->isString()) {
         return string_replace(template_string, itr, key);
@@ -114,5 +116,7 @@ static std::string replace(const std::string& template_string, Json::Value::cons
         return array_replace(template_string, itr, key);
     } else if (itr->isObject()) {
         return object_replace(template_string, itr, key);
+    } else {
+        return template_string;
     }
 }
