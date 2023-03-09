@@ -12,7 +12,7 @@
 
 static void wrong_input()
 {
-    fmt::print("\nPlease specify a command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
+    fmt::print("\nPlease input a valid command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
 }
 
 static int init()
