@@ -28,7 +28,7 @@ Run `templtr init` in the project root to create a templtr project.
 #### `/pages` directory
 `/pages` is where all html templates are stored. Template files are similar to `.html` files, including the file extension. They do however slightly differ in the file contents.
 
-Pages what will only have a single instance should be named for example `page.html`. Pages with multiple routes should named for example `[page].html` (the square brackets tells templtr that the page is dynamic).
+Pages that will only have a single instance should be named for example `page.html`. Pages with multiple routes should named for example `[page].html` (the square brackets tells templtr that the page is dynamic).
 
 To include dynamic content in your template, surround a property name with curly brackets.
 Example:
@@ -40,7 +40,7 @@ Example:
 
 To include an object, simply write the path to the object, like you would in JavaScript and other languages' objects.
 Example:
-`{object.name}` will be replaced by `name` sub-property of the `object` property.
+`{object.name}` will be replaced by the `name` sub-property of the `object` root-property.
 
 To include a component, write the name of the component within a closed html start-tag.
 Example:
