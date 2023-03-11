@@ -9,6 +9,7 @@
 	],
 	"$purchase": {
 		"type": "httpRequest",
+		"target": "https://example.com/",
 		"method": "POST",
 		"body": {
 			"id": 1,
