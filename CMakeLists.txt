@@ -12,7 +12,7 @@ include(cmake/Vcpkg.cmake) # needs to happen before project()
 
 project(
     "templtr"
-    VERSION 0.2.0
+    VERSION 0.3.0
     LANGUAGES CXX
 )
 
@@ -25,9 +25,9 @@ include(cmake/Git.cmake)
 ### SETTINGS ###
 
 # add all headers (.h, .hpp) to this
-set(PRJ_HEADERS src/replace.h)
+set(PRJ_HEADERS src/replace.h src/events.h)
 # add all source files (.cpp) to this, except the one with main()
-set(PRJ_SOURCES src/replace.cpp)
+set(PRJ_SOURCES src/replace.cpp src/events.cpp)
 # set the source file containing main()
 set(PRJ_MAIN src/main.cpp)
 # set include paths not part of libraries

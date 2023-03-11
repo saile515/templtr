@@ -1,5 +1,7 @@
 #include "replace.h"
 
+#include "events.h"
+
 #include <fmt/core.h>
 #include <regex>
 
@@ -102,7 +104,11 @@ std::string object_replace(const std::string& template_string, Json::Value::cons
 
 std::string replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
-    if (itr->isString()) {
+    std::string local_key = itr.name();
+
+    if (local_key[0] == char(36)) { // Is event (36 == $)
+        return build_event(template_string, itr, key);
+    } else if (itr->isString()) {
         return string_replace(template_string, itr, key);
     } else if (itr->isInt()) {
         return int_replace(template_string, itr, key);

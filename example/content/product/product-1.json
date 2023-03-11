@@ -6,5 +6,13 @@
 	"recommendedProducts": [
 		{ "name": "Product 2", "price": 12 },
 		{ "name": "Product 3", "price": 299 }
-	]
+	],
+	"$purchase": {
+		"type": "httpRequest",
+		"method": "POST",
+		"body": {
+			"id": 1,
+			"name": "Product 1"
+		}
+	}
 }
