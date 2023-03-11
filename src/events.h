@@ -3,5 +3,5 @@
 #include <json/json.h>
 #include <string>
 
-int http_event(Json::Value::const_iterator itr, std::string id);
-std::string build_event(const std::string& template_string, Json::Value::const_iterator itr, std::string key);
+int http_event(std::string& out_str, Json::Value::const_iterator itr, std::string id);
+std::string event_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key);
