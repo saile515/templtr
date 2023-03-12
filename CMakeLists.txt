@@ -1,14 +1,18 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-if(WIN32)
-    set(VCPKG_TARGET_TRIPLET "x64-windows-static")
+if (WIN32)
+    if (CMAKE_CXX_COMPILER MATCHES "g\\+\\+.exe")
+        set(VCPKG_TARGET_TRIPLET "x64-mingw-static")
+    elseif(CMAKE_CXX_COMPILER MATCHES "cl.exe")
+        set(VCPKG_TARGET_TRIPLET "x64-windows-static")
+    endif()
 endif()
 
 include(cmake/Vcpkg.cmake) # needs to happen before project()
 
 project(
     "templtr"
-    VERSION 0.1.0
+    VERSION 0.2.0
     LANGUAGES CXX
 )
 
@@ -21,9 +25,9 @@ include(cmake/Git.cmake)
 ### SETTINGS ###
 
 # add all headers (.h, .hpp) to this
-# set(PRJ_HEADERS)
+set(PRJ_HEADERS src/replace.h)
 # add all source files (.cpp) to this, except the one with main()
-# set(PRJ_SOURCES src/main.cpp)
+set(PRJ_SOURCES src/replace.cpp)
 # set the source file containing main()
 set(PRJ_MAIN src/main.cpp)
 # set include paths not part of libraries
