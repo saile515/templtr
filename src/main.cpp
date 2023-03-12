@@ -31,6 +31,10 @@ static int init()
         std::filesystem::create_directory("content");
     }
 
+    if (!std::filesystem::exists("public")) {
+        std::filesystem::create_directory("public");
+    }
+
     fmt::print("Project initialized!\n");
 
     return 0;
@@ -170,6 +174,9 @@ static int build(std::string_view outdir)
 
         fmt::print("Finished building {}\n", page_name);
     }
+
+    // Move public files to root of outdir
+    std::filesystem::copy("public", outdir, std::filesystem::copy_options::recursive);
 
     // Calculate build duration
     std::chrono::time_point end_time = std::chrono::high_resolution_clock::now();

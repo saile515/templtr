@@ -2,7 +2,7 @@
 	"name": "Product 1",
 	"price": 99,
 	"description": "This is the best product ever! Buy now to improve your life!",
-	"imageUrl": "/image.jpg",
+	"imageUrl": "/product-image.png",
 	"recommendedProducts": [
 		{ "name": "Product 2", "price": 12 },
 		{ "name": "Product 3", "price": 299 }
