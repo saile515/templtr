@@ -3,8 +3,9 @@
 #include <fmt/core.h>
 #include <math.h>
 #include <regex>
+#include <string>
 
-template <class T, bool optional = true>
+template <class T, bool optional = false>
 class EventValue {
 public:
     T value;
@@ -27,7 +28,7 @@ public:
                 return -1;
             }
         } else {
-            if (!optional) {
+            if constexpr(!optional) {
                 fmt::print("Error: Event property '{}' is not defined\n", key);
             }
 
@@ -37,12 +38,12 @@ public:
         return 0;
     }
 
-    operator=(T new_value)
+    void operator=(T new_value)
     {
         value = new_value;
     }
 
-    operator==(const T val)
+    bool operator==(const T val)
     {
         return value == val;
     }
@@ -56,8 +57,8 @@ struct Event {
 struct HttpEvent : public Event {
     EventValue<std::string> target;
     EventValue<std::string> method;
-    EventValue<std::string, false> body;
-    EventValue<std::string, false> response_selector;
+    EventValue<std::string, true> body;
+    EventValue<std::string, true> response_selector;
 };
 
 static int id = -1;

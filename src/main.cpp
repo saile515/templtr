@@ -88,7 +88,7 @@ static int build(std::string_view outdir)
             // Read template file
             std::string tmpl = read_template_file(tmpl_path);
             if (tmpl == "") {
-                fmt::print("Error: No matching template for {}", page_name);
+                fmt::print("Error: No matching template for {}\n", page_name);
                 return -1;
             }
 
@@ -129,7 +129,7 @@ static int build(std::string_view outdir)
             // Read template file
             std::string tmpl = read_template_file(tmpl_path);
             if (tmpl == "") {
-                fmt::print("Error: No matching template for {}", page_name);
+                fmt::print("Error: No matching template for {}\n", page_name);
                 return -1;
             }
 
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
     } else if (std::strcmp(argv[1], "build") == 0) {
         if (argc == 3) {
             if (build(argv[2]) < 0) {
-                fmt::print("Build failed!");
+                fmt::print("Build failed!\n");
             }
         } else {
             wrong_input();
