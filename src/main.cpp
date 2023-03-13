@@ -1,3 +1,4 @@
+#include "globals.h"
 #include "replace.h"
 #include <chrono>
 #include <filesystem>
@@ -55,6 +56,31 @@ static std::string read_template_file(std::string tmpl_path)
     }
 }
 
+static void build_page(std::string page_path, std::string tmpl)
+{
+    std::ifstream entry_file(page_path, std::ifstream::binary);
+    Json::Value data;
+    entry_file >> data;
+
+    std::string built_page = tmpl;
+
+    // Iterate over keys
+    if (data.size() > 0) {
+        for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
+            std::string key = itr.name();
+
+            built_page = replace(built_page, itr, key);
+        }
+    }
+
+    // Write to file
+    std::filesystem::create_directory(Global::current_outdir);
+    std::ofstream out_file(fmt::format("{}/index.html", Global::current_outdir));
+
+    out_file << built_page;
+    out_file.close();
+}
+
 static int build(std::string_view outdir)
 {
     fmt::print("Started build...\n");
@@ -65,7 +91,10 @@ static int build(std::string_view outdir)
         std::filesystem::remove_all(outdir);
     }
 
-    std::filesystem::create_directory(outdir);
+    // std::filesystem::create_directory(outdir);
+
+    // Move public files to root of outdir
+    std::filesystem::copy("public", outdir, std::filesystem::copy_options::recursive);
 
     std::vector<std::tuple<std::string, std::string>> components;
 
@@ -85,98 +114,42 @@ static int build(std::string_view outdir)
 
         std::filesystem::create_directory(fmt::format("{}/{}", outdir, page_name));
 
-        // Iterate over static pages
-        if (std::filesystem::is_regular_file(page_path)) {
-            std::string tmpl_path = fmt::format("pages/{}.html", page_name);
+        std::string tmpl_path;
 
-            // Read template file
-            std::string tmpl = read_template_file(tmpl_path);
-            if (tmpl == "") {
-                fmt::print("Error: No matching template for {}\n", page_name);
-                return -1;
-            }
-
-            // Populate components
-            for (const auto& component : components) {
-                tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
-            }
-
-            std::ifstream entry_file(page_path, std::ifstream::binary);
-            Json::Value data;
-            entry_file >> data;
-
-            std::string built_page = tmpl;
-
-            // Iterate over keys
-            if (data.size() > 0) {
-                for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
-                    std::string key = itr.name();
-
-                    built_page = replace(built_page, itr, key);
-                }
-            }
-
-            // Write to file
-            std::string out_dir = fmt::format("{}/{}", outdir, page_name);
-            std::filesystem::create_directory(out_dir);
-            std::ofstream out_file(fmt::format("{}/index.html", out_dir));
-
-            out_file << built_page;
-
-            out_file.close();
+        if (std::filesystem::is_regular_file(page_path)) { // Static page
+            tmpl_path = fmt::format("pages/{}.html", page_name);
+        } else if (std::filesystem::is_directory(page_path)) { // Dynamic page
+            tmpl_path = fmt::format("pages/[{}].html", page_name);
         }
 
-        // Iterate over dynamic pages
-        if (std::filesystem::is_directory(page_path)) {
-            std::string tmpl_path = fmt::format("pages/[{}].html", page_name);
+        // Read template file
+        std::string tmpl = read_template_file(tmpl_path);
+        if (tmpl == "") {
+            fmt::print("Error: No matching template for {}\n", page_name);
+            return -1;
+        }
 
-            // Read template file
-            std::string tmpl = read_template_file(tmpl_path);
-            if (tmpl == "") {
-                fmt::print("Error: No matching template for {}\n", page_name);
-                return -1;
-            }
+        // Populate components
+        for (const auto& component : components) {
+            tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
+        }
 
-            // Populate components
-            for (const auto& component : components) {
-                tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
-            }
-
+        if (std::filesystem::is_regular_file(page_path)) { // Static page
+            Global::current_outdir = fmt::format("{}/{}", outdir, page_name);
+            build_page(page_path, tmpl);
+        } else if (std::filesystem::is_directory(page_path)) { // Dynamic page
             for (const auto& entry : std::filesystem::directory_iterator(page_path)) {
                 std::string entry_filename = entry.path().string();
                 std::string entry_name = entry.path().stem().string();
 
-                std::ifstream entry_file(entry_filename, std::ifstream::binary);
-                Json::Value data;
-                entry_file >> data;
+                Global::current_outdir = fmt::format("{}/{}/{}", outdir, page_name, entry_name);
 
-                std::string built_page = tmpl;
-
-                // Iterate over keys
-                if (data.size() > 0) {
-                    for (Json::Value::const_iterator itr = data.begin(); itr != data.end(); itr++) {
-                        std::string key = itr.name();
-
-                        built_page = replace(built_page, itr, key);
-                    }
-                }
-
-                // Write to file
-                std::string out_dir = fmt::format("{}/{}/{}", outdir, page_name, entry_name);
-                std::filesystem::create_directory(out_dir);
-                std::ofstream out_file(fmt::format("{}/index.html", out_dir));
-
-                out_file << built_page;
-
-                out_file.close();
+                build_page(entry_filename, tmpl);
             }
         }
 
         fmt::print("Finished building {}\n", page_name);
     }
-
-    // Move public files to root of outdir
-    std::filesystem::copy("public", outdir, std::filesystem::copy_options::recursive);
 
     // Calculate build duration
     std::chrono::time_point end_time = std::chrono::high_resolution_clock::now();

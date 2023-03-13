@@ -71,6 +71,11 @@ struct HttpEvent : public Event {
     EventValue<std::string, true> response_selector;
 };
 
+struct WsListenEvent : public Event {
+    EventValue<std::string> target;
+    EventValue<std::string, true> response_selector;
+};
+
 static int next_id = -1;
 
 // Can generate up to 456976 (26^4) IDs
