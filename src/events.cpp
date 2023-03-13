@@ -77,7 +77,7 @@ static int next_id = -1;
 static std::string generate_id()
 {
     ++next_id;
-    return fmt::format("{}{}{}{}", char(97 + (int(floor(id / (26 * 26 * 26))) % 26)), char(97 + (int(floor(id / (26 * 26))) % 26)), char(97 + (int(floor(id / 26)) % 26)), char(97 + (id % 26)));
+    return fmt::format("{}{}{}{}", char(97 + (int(floor(next_id / (26 * 26 * 26))) % 26)), char(97 + (int(floor(next_id / (26 * 26))) % 26)), char(97 + (int(floor(next_id / 26)) % 26)), char(97 + (next_id % 26)));
 }
 
 std::string event_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
