@@ -28,7 +28,7 @@ public:
                 return -1;
             }
         } else {
-            if constexpr(!optional) {
+            if constexpr (!optional) {
                 fmt::print("Error: Event property '{}' is not defined\n", key);
             }
 
@@ -48,11 +48,13 @@ public:
         return value == val;
     }
 
-    operator T&() {
+    operator T&()
+    {
         return value;
     }
 
-    operator T() const {
+    operator T() const
+    {
         return value;
     }
 };
@@ -69,12 +71,12 @@ struct HttpEvent : public Event {
     EventValue<std::string, true> response_selector;
 };
 
-static int id = -1;
+static int next_id = -1;
 
 // Can generate up to 456976 (26^4) IDs
 static std::string generate_id()
 {
-    ++id;
+    ++next_id;
     return fmt::format("{}{}{}{}", char(97 + (int(floor(id / (26 * 26 * 26))) % 26)), char(97 + (int(floor(id / (26 * 26))) % 26)), char(97 + (int(floor(id / 26)) % 26)), char(97 + (id % 26)));
 }
 
