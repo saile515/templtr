@@ -1,9 +1,12 @@
 #include "events.h"
 
+#include "globals.h"
+
 #include <fmt/core.h>
 #include <math.h>
 #include <regex>
 #include <string>
+#include <fstream>
 
 template <class T, bool optional = false>
 class EventValue {
@@ -98,13 +101,23 @@ std::string event_replace(const std::string& template_string, Json::Value::const
         http_event(js_out, itr, event_id);
     }
 
-    js_out = std::regex_replace(js_out, std::regex("[\'\"]"), "&quot;");
+    // Minify js
     js_out = std::regex_replace(js_out, std::regex("[\n\r\t]"), "");
+
+    // Write to file
+    std::string out_filepath = fmt::format("{}/{}.js", Global::current_outdir, event_id);
+    std::ofstream out_file(out_filepath);
+
+    out_file << js_out;
+    out_file.close();
+
+    // Replace in template
+    Global::scripts.push_back(fmt::format("./{}.js", event_id));
 
     std::string final_key = fmt::format("{}:trigger", key);
 
     std::regex regex(fmt::format("\\{{\\{}\\}}", final_key));
-    return std::regex_replace(template_string, regex, js_out);
+    return std::regex_replace(template_string, regex, fmt::format("{}()", event_id));
 };
 
 int http_event(std::string& out_str, Json::Value::const_iterator itr, std::string id)
@@ -118,7 +131,7 @@ int http_event(std::string& out_str, Json::Value::const_iterator itr, std::strin
     event.method.find_in_iterator(itr, "method");
     event.body.find_in_iterator(itr, "body");
 
-    std::string js_out = "";
+    std::string js_out = fmt::format("function {}(){{", id);
 
     if (event.method == "GET" || event.method == "DELETE") {
         js_out += fmt::format("fetch('{}')", event.target.value);
@@ -133,6 +146,8 @@ int http_event(std::string& out_str, Json::Value::const_iterator itr, std::strin
         js_out += ".then(res => res.text())";
         js_out += fmt::format(".then(res => document.querySelectorAll('{}').forEach((match) => match.innerHTML = res))", event.response_selector.value);
     }
+
+    js_out += "};";
 
     out_str = js_out;
 

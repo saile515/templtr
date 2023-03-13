@@ -11,6 +11,9 @@
 #include <string_view>
 #include <vector>
 
+std::string Global::current_outdir;
+std::vector<std::string> Global::scripts;
+
 static void wrong_input()
 {
     fmt::print("\nPlease input a valid command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\n");
@@ -58,6 +61,9 @@ static std::string read_template_file(std::string tmpl_path)
 
 static void build_page(std::string page_path, std::string tmpl)
 {
+    Global::scripts.clear();
+    std::filesystem::create_directories(Global::current_outdir);
+
     std::ifstream entry_file(page_path, std::ifstream::binary);
     Json::Value data;
     entry_file >> data;
@@ -73,8 +79,15 @@ static void build_page(std::string page_path, std::string tmpl)
         }
     }
 
+    // Add scripts
+    std::string scripts_str = "";
+    for (auto& script : Global::scripts)
+    {
+        scripts_str += fmt::format("<script src='{}' async></script>", script);
+    }
+    built_page = std::regex_replace(built_page, std::regex("</head>"), fmt::format("{}</head>", scripts_str));
+
     // Write to file
-    std::filesystem::create_directories(Global::current_outdir);
     std::ofstream out_file(fmt::format("{}/index.html", Global::current_outdir));
 
     out_file << built_page;
