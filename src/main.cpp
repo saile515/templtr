@@ -74,7 +74,7 @@ static void build_page(std::string page_path, std::string tmpl)
     }
 
     // Write to file
-    std::filesystem::create_directory(Global::current_outdir);
+    std::filesystem::create_directories(Global::current_outdir);
     std::ofstream out_file(fmt::format("{}/index.html", Global::current_outdir));
 
     out_file << built_page;
@@ -112,8 +112,6 @@ static int build(std::string_view outdir)
         std::string page_path = page.path().string();
         fmt::print("Building {}...\n", page_name);
 
-        std::filesystem::create_directory(fmt::format("{}/{}", outdir, page_name));
-
         std::string tmpl_path;
 
         if (std::filesystem::is_regular_file(page_path)) { // Static page
@@ -135,7 +133,13 @@ static int build(std::string_view outdir)
         }
 
         if (std::filesystem::is_regular_file(page_path)) { // Static page
-            Global::current_outdir = fmt::format("{}/{}", outdir, page_name);
+            if (page_name == "index") {
+                Global::current_outdir = outdir;
+            } else {
+                Global::current_outdir = fmt::format("{}/{}", outdir, page_name);
+                
+            }
+            
             build_page(page_path, tmpl);
         } else if (std::filesystem::is_directory(page_path)) { // Dynamic page
             for (const auto& entry : std::filesystem::directory_iterator(page_path)) {
