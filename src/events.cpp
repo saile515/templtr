@@ -97,8 +97,16 @@ std::string event_replace(const std::string& template_string, Json::Value::const
 
     std::string js_out;
 
+    int event_status = -1;
+
     if (event_type == "httpRequest") {
-        http_event(js_out, itr, event_id);
+        event_status = http_event(js_out, itr, event_id);
+    } else if (event_type == "wsListen") {
+        event_status = ws_listen_event(js_out, itr, event_id);
+    }
+
+    if (event_status != 0) {
+        fmt::print("Error: Failed to parse event \"{}\"", event_id);
     }
 
     // Minify js
@@ -144,10 +152,31 @@ int http_event(std::string& out_str, Json::Value::const_iterator itr, std::strin
 
     if (event.response_selector.find_in_iterator(itr, "responseSelector") == 0) {
         js_out += ".then(res => res.text())";
-        js_out += fmt::format(".then(res => document.querySelectorAll('{}').forEach((match) => match.innerHTML = res))", event.response_selector.value);
+        js_out += fmt::format(".then(res => )", event.response_selector.value);
     }
 
     js_out += "};";
+
+    out_str = js_out;
+
+    return 0;
+}
+
+int ws_listen_event(std::string& out_str, Json::Value::const_iterator itr, std::string id)
+{
+    WsListenEvent event;
+
+    event.id = id;
+
+    event.type.find_in_iterator(itr, "type");
+    event.target.find_in_iterator(itr, "target");
+
+    std::string js_out = fmt::format("const socket = new WebSocket('{}');", event.target.value);
+    js_out += "socket.addEventListener('message', (event) = > {";
+    if (event.response_selector.find_in_iterator(itr, "responseSelector")) {
+        js_out += fmt::format("document.querySelectorAll('{}').forEach((match) => match.innerHTML = event.data)", event.response_selector.value);
+    }
+    js_out += "});";
 
     out_str = js_out;
 
