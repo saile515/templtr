@@ -1,0 +1,28 @@
+.navbar {
+	background-color: #f4f4f5;
+	padding: 2rem;
+}
+
+.navbar h2 {
+	font-size: 1.25rem;
+}
+
+.navbar nav ul {
+	padding: 0;
+	list-style: none;
+}
+
+.navbar nav ul li {
+	margin: 0.25rem 0;
+}
+
+.navbar .category {
+	font-weight: bold;
+	font-size: 1.125rem;
+	margin: 0.5rem 0;
+}
+
+.navbar a {
+	color: #27272a;
+	text-decoration: none;
+}

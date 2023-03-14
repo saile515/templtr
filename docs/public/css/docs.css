@@ -5,5 +5,23 @@ article {
 
 article h1 {
 	border-bottom: 2px #d4d4d8 solid;
-	line-height: 2em;
+	margin-bottom: 1rem;
+	padding-bottom: 0.25rem;
+	font-size: 1.75rem;
+}
+
+article .category {
+	font-weight: bold;
+	color: #0e7490;
+}
+
+article .summary {
+	font-style: italic;
+	font-size: 1.125rem;
+}
+
+article code {
+	padding: 0.125rem 0.25rem;
+	background-color: #e5e7eb;
+	border-radius: 0.25rem;
 }
