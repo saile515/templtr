@@ -1,5 +1,6 @@
 article {
 	margin: 2rem;
+	white-space: pre-wrap;
 }
 
 article h1 {

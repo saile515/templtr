@@ -4,12 +4,25 @@
 
 #include <fmt/core.h>
 #include <regex>
+#include <fstream>
 
 std::string string_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
     std::string value = itr->asString();
 
     std::regex regex(fmt::format("\\{{{}\\}}", key));
+
+    std::smatch file_match;
+    std::regex_match(value, file_match, std::regex(":(.*):"));
+
+    if (!file_match.empty()) {
+        std::ifstream file(fmt::format("public{}", file_match[1].str()), std::ifstream::binary);
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        value = buffer.str();
+        value = std::regex_replace(value, std::regex("\r\n"), "\n");
+    }
+
     return std::regex_replace(template_string, regex, value);
 }
 
