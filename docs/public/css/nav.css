@@ -47,6 +47,15 @@
 	background-image: url("/icons/menu.svg");
 }
 
+#close-nav {
+	display: none;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
 .filler {
 	display: none;
 }
@@ -71,7 +80,16 @@
 		display: block;
 	}
 
+	#navbar nav ul {
+		z-index: 10;
+		position: relative;
+	}
+
 	#open-nav {
+		display: block;
+	}
+
+	#close-nav {
 		display: block;
 	}
 
