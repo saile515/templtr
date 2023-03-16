@@ -17,6 +17,16 @@ body {
 	min-height: 100vh;
 }
 
+code {
+	padding: 0.125rem 0.25rem;
+	background-color: #e5e7eb;
+	border-radius: 0.25rem;
+}
+
+.note {
+	font-style: italic;
+}
+
 @media screen and (max-width: 768px) {
 	#root-container {
 		display: block;

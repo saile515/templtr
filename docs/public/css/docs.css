@@ -18,9 +18,3 @@ article .summary {
 	font-style: italic;
 	font-size: 1.125rem;
 }
-
-article code {
-	padding: 0.125rem 0.25rem;
-	background-color: #e5e7eb;
-	border-radius: 0.25rem;
-}
