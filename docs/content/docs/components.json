@@ -1,6 +1,0 @@
-{
-	"category": "Directories",
-	"title": "Components",
-	"summary": "Components are reusable html snippets that can be used in multiple templates.",
-	"article": "<code>/components</code> is where all component files are stored. The name of the component file will be the component name (without <code>.html</code>). \n\nComponents can include dynamic properties, which will be filled on a per-page basis in build-time. \n\n<span class='note'>Note: Support for sorting components in directories is currently not supported, but is a planned feature.</span>"
-}
