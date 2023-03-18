@@ -3,8 +3,9 @@
 #include "events.h"
 
 #include <fmt/core.h>
-#include <regex>
 #include <fstream>
+#include <regex>
+#include <string>
 
 std::string string_replace(const std::string& template_string, Json::Value::const_iterator itr, std::string key)
 {
