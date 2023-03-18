@@ -17,9 +17,12 @@ body {
 }
 
 code {
+	display: inline-block;
 	padding: 0.125rem 0.25rem;
 	background-color: #e5e7eb;
 	border-radius: 0.25rem;
+	tab-size: 4;
+	white-space: pre-wrap;
 }
 
 .note {

@@ -1,0 +1,38 @@
+{
+	"category": "Events",
+	"title": "httpRequest",
+	"summary": "Make http requests without code.",
+	"options": [
+		{
+			"name": "target",
+			"description": "specifies the target of the http request.",
+			"type": "string",
+			"optional": false
+		},
+		{
+			"name": "method",
+			"description": "the http method to use. GET/POST/PUT/DELETE",
+			"type": "string",
+			"optional": false
+		},
+		{
+			"name": "body",
+			"description": "the body of a POST/PUT request.",
+			"type": "any",
+			"optional": true
+		},
+		{
+			"name": "responseSelector",
+			"description": "a selector query of which to replace the innerHTML with the response of the request. Uses document.querySelectorAll internally.",
+			"type": "string",
+			"optional": true
+		}
+	],
+	"methods": [
+		{
+			"name": "trigger",
+			"description": "triggers the http request."
+		}
+	],
+	"example": ":/content/examples/http-request.json:"
+}

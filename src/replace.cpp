@@ -49,9 +49,9 @@ std::string bool_replace(const std::string& template_string, Json::Value::const_
     std::string value;
 
     if (raw_value)
-        value = "True";
+        value = "true";
     else
-        value = "False";
+        value = "false";
 
     std::regex regex(fmt::format("\\{{{}\\}}", key));
     return std::regex_replace(template_string, regex, value);
