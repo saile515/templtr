@@ -40,11 +40,13 @@ set(PRJ_DEFINITIONS )
 set(PRJ_LIBRARIES 
     fmt::fmt
     JsonCpp::JsonCpp
+    re2::re2
 )
 
 # add dependency find_package calls and similar here
 find_package(fmt CONFIG REQUIRED)
 find_package(jsoncpp CONFIG REQUIRED)
+find_package(re2 CONFIG REQUIRED)
 
 ### END SETTINGS ###
 

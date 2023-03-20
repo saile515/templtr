@@ -1,5 +1,5 @@
 {
 	"name": "templtr",
 	"version-string": "0.3.0",
-	"dependencies": ["fmt", "jsoncpp"]
+	"dependencies": ["fmt", "jsoncpp", "re2"]
 }
