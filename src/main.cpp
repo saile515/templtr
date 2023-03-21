@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <json/json.h>
-#include <regex>
+#include <re2/re2.h>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -52,7 +52,7 @@ static std::string read_template_file(std::string tmpl_path)
         buffer << tmpl_file.rdbuf();
         std::string tmpl = buffer.str();
         // Minify
-        tmpl = std::regex_replace(tmpl, std::regex("[\n\r\t]"), "");
+        re2::RE2::GlobalReplace(&tmpl, "[\n\r\t]", "");
         return tmpl;
     } else {
         return "";
@@ -81,11 +81,11 @@ static void build_page(std::string page_path, std::string tmpl)
 
     // Add scripts
     std::string scripts_str = "";
-    for (auto& script : Global::scripts)
-    {
+    for (auto& script : Global::scripts) {
         scripts_str += fmt::format("<script src='{}' async></script>", script);
     }
-    built_page = std::regex_replace(built_page, std::regex("</head>"), fmt::format("{}</head>", scripts_str));
+    re2::RE2::GlobalReplace(&scripts_str, "\\\\", "\\\\\\\\");
+    re2::RE2::GlobalReplace(&built_page, "</head>", fmt::format("{}</head>", scripts_str));
 
     // Write to file
     std::ofstream out_file(fmt::format("{}/index.html", Global::current_outdir));
@@ -142,7 +142,7 @@ static int build(std::string_view outdir)
 
         // Populate components
         for (const auto& component : components) {
-            tmpl = std::regex_replace(tmpl, std::regex(fmt::format("<{}[^>]*>", std::get<0>(component))), std::get<1>(component));
+            re2::RE2::GlobalReplace(&tmpl, fmt::format("<{}[^>]*>", std::get<0>(component)), std::get<1>(component));
         }
 
         if (std::filesystem::is_regular_file(page_path)) { // Static page
@@ -150,9 +150,8 @@ static int build(std::string_view outdir)
                 Global::current_outdir = outdir;
             } else {
                 Global::current_outdir = fmt::format("{}/{}", outdir, page_name);
-                
             }
-            
+
             build_page(page_path, tmpl);
         } else if (std::filesystem::is_directory(page_path)) { // Dynamic page
             for (const auto& entry : std::filesystem::directory_iterator(page_path)) {

@@ -3,10 +3,10 @@
 #include "globals.h"
 
 #include <fmt/core.h>
-#include <math.h>
-#include <regex>
-#include <string>
 #include <fstream>
+#include <math.h>
+#include <re2/re2.h>
+#include <string>
 
 template <class T, bool optional = false>
 class EventValue {
@@ -21,7 +21,9 @@ public:
 
                 if (val.isObject() || val.isArray()) {
                     Json::FastWriter writer;
-                    this->value = T(std::regex_replace(writer.write(val), std::regex("[\'\"]"), "\\'"));
+                    std::string json_str = writer.write(val);
+                    re2::RE2::GlobalReplace(&json_str, "[\'\"]", "\\\\'");
+                    this->value = T(json_str);
                 } else {
                     this->value = T(val.asString());
                 }
@@ -110,7 +112,7 @@ std::string event_replace(const std::string& template_string, Json::Value::const
     }
 
     // Minify js
-    js_out = std::regex_replace(js_out, std::regex("[\n\r\t]"), "");
+    re2::RE2::GlobalReplace(&js_out, "[\n\r\t]", "");
 
     // Write to file
     std::string out_filepath = fmt::format("{}/{}.js", Global::current_outdir, event_id);
@@ -124,8 +126,9 @@ std::string event_replace(const std::string& template_string, Json::Value::const
 
     std::string final_key = fmt::format("{}:trigger", key);
 
-    std::regex regex(fmt::format("\\{{\\{}\\}}", final_key));
-    return std::regex_replace(template_string, regex, fmt::format("{}()", event_id));
+    std::string result_string = template_string;
+    re2::RE2::GlobalReplace(&result_string, fmt::format("\\{{\\{}\\}}", final_key), fmt::format("{}()", event_id));
+    return result_string;
 };
 
 int http_event(std::string& out_str, Json::Value::const_iterator itr, std::string id)
