@@ -7,3 +7,7 @@ The homepage (<code>/</code>) can be created with a file in the root of the cont
 <span class='note'>Note: Support for nested routing is currently not implemented, but is a planned feature.</span>
 
 The <code>.json</code> files should be populated with the dynamic properties in the template files. Property values can be strings, arrays, object, numbers, etc. String properties can also include html code.
+
+To embed a file, surround the filename (relative to the public directory) with colons.
+Example: <code>"content": ":/my-txt-file.txt:"</code>
+<span class='note'>Note: All UTF-8 file formats are supported. It doesn't have to be a <code>.txt</code> file.</span>
