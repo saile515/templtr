@@ -1,0 +1,7 @@
+{
+	"$exampleEvent": {
+		"type": "wsListen",
+		"target": "ws://example.com/",
+		"responseSelector": "#result"
+	}
+}

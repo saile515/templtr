@@ -1,0 +1,6 @@
+{
+	"category": "Directories",
+	"title": "Public",
+	"summary": "The <code>/public</code> directory is where all static files are stored.",
+	"article": ":/content/public.txt:"
+}
