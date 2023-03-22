@@ -25,9 +25,9 @@ include(cmake/Git.cmake)
 ### SETTINGS ###
 
 # add all headers (.h, .hpp) to this
-set(PRJ_HEADERS src/replace.h src/events.h)
+set(PRJ_HEADERS src/build.h src/replace.h src/events.h src/DevServer.h)
 # add all source files (.cpp) to this, except the one with main()
-set(PRJ_SOURCES src/replace.cpp src/events.cpp)
+set(PRJ_SOURCES src/build.cpp src/replace.cpp src/events.cpp src/DevServer.cpp)
 # set the source file containing main()
 set(PRJ_MAIN src/main.cpp)
 # set include paths not part of libraries
@@ -41,12 +41,14 @@ set(PRJ_LIBRARIES
     fmt::fmt
     JsonCpp::JsonCpp
     re2::re2
+    efsw::efsw
 )
 
 # add dependency find_package calls and similar here
 find_package(fmt CONFIG REQUIRED)
 find_package(jsoncpp CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
+find_package(efsw CONFIG REQUIRED)
 
 ### END SETTINGS ###
 
