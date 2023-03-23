@@ -1,5 +1,6 @@
 #include "build.h"
 #include <efsw/efsw.hpp>
+#include <httplib.h>
 #include <string>
 
 class UpdateListener : public efsw::FileWatchListener {
@@ -15,6 +16,7 @@ class DevServer {
 private:
     efsw::FileWatcher file_watcher;
     UpdateListener listener;
+    httplib::Server web_server;
 
 public:
     DevServer(std::string outdir);

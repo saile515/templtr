@@ -42,6 +42,7 @@ set(PRJ_LIBRARIES
     JsonCpp::JsonCpp
     re2::re2
     efsw::efsw
+    httplib::httplib
 )
 
 # add dependency find_package calls and similar here
@@ -49,6 +50,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(jsoncpp CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 find_package(efsw CONFIG REQUIRED)
+find_package(httplib CONFIG REQUIRED)
 
 ### END SETTINGS ###
 

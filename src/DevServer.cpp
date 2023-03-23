@@ -24,5 +24,10 @@ DevServer::DevServer(std::string out_dir)
     }
 
     file_watcher.watch();
+
+    web_server.set_mount_point("/", out_dir);
+
     fmt::print("Started dev server\n");
+
+    web_server.listen("0.0.0.0", 3000);
 }
