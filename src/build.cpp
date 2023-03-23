@@ -65,20 +65,18 @@ void build_page(std::string page_path, std::string tmpl)
     out_file.close();
 }
 
-int build(std::string outdir)
+int build(Options options)
 {
     fmt::print("Started build...\n");
 
     std::chrono::time_point start_time = std::chrono::high_resolution_clock::now();
 
-    if (std::filesystem::exists(outdir)) {
-        std::filesystem::remove_all(outdir);
+    if (std::filesystem::exists(options.out_dir)) {
+        std::filesystem::remove_all(options.out_dir);
     }
 
-    // std::filesystem::create_directory(outdir);
-
-    // Move public files to root of outdir
-    std::filesystem::copy("public", outdir, std::filesystem::copy_options::recursive);
+    // Move public files to root of out_dir
+    std::filesystem::copy("public", options.out_dir, std::filesystem::copy_options::recursive);
 
     std::vector<std::tuple<std::string, std::string>> components;
 
@@ -116,11 +114,13 @@ int build(std::string outdir)
             re2::RE2::GlobalReplace(&tmpl, fmt::format("<{}[^>]*>", std::get<0>(component)), std::get<1>(component));
         }
 
+        re2::RE2::GlobalReplace(&tmpl, "</head>", fmt::format("{}</head>", fmt::format("<base href=\"{}\"/>", options.base)));
+
         if (std::filesystem::is_regular_file(page_path)) { // Static page
             if (page_name == "index") {
-                Global::current_outdir = outdir;
+                Global::current_outdir = options.out_dir;
             } else {
-                Global::current_outdir = fmt::format("{}/{}", outdir, page_name);
+                Global::current_outdir = fmt::format("{}/{}", options.out_dir, page_name);
             }
 
             build_page(page_path, tmpl);
@@ -129,7 +129,7 @@ int build(std::string outdir)
                 std::string entry_filename = entry.path().string();
                 std::string entry_name = entry.path().stem().string();
 
-                Global::current_outdir = fmt::format("{}/{}/{}", outdir, page_name, entry_name);
+                Global::current_outdir = fmt::format("{}/{}/{}", options.out_dir, page_name, entry_name);
 
                 build_page(entry_filename, tmpl);
             }

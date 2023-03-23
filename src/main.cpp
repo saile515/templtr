@@ -1,5 +1,6 @@
 #include "DevServer.h"
 #include "build.h"
+#include "globals.h"
 
 #include <chrono>
 #include <filesystem>
@@ -8,7 +9,7 @@
 
 static void wrong_input()
 {
-    fmt::print("\nPlease input a valid command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild <outdir> - Build project files to specified directory\n\tdev <outdir> - Start a dev server that builds to outdir on change\n\n");
+    fmt::print("\nPlease input a valid command. Available commands are as follows:\n\n\tinit - Init a templtr project\n\tbuild - Build project files\n\tdev - Start a dev server that builds on source change\n\n");
 }
 
 static int init()
@@ -43,19 +44,36 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    Options options;
+
+    if (argc >= 4) {
+        for (int i = 2; i < argc; ++i) {
+            if (std::strcmp(argv[i], "-o") == 0) {
+                options.out_dir = argv[i + 1];
+            } else if (std::strcmp(argv[i], "-b") == 0) {
+                options.base = argv[i + 1];
+            } else {
+                continue;
+            }
+
+            ++i;
+        }
+    }
+
     if (std::strcmp(argv[1], "init") == 0) {
         init();
     } else if (std::strcmp(argv[1], "build") == 0) {
-        if (argc == 3) {
-            if (build(argv[2]) < 0) {
+        if (argc >= 2) {
+            if (build(options) < 0) {
                 fmt::print("Build failed!\n");
             }
         } else {
             wrong_input();
+            return -1;
         }
     } else if (std::strcmp(argv[1], "dev") == 0) {
-        if (argc == 3) {
-            DevServer dev_server(argv[2]);
+        if (argc >= 2) {
+            DevServer dev_server(options);
             signal(SIGINT, exit);
 
             while (true) {
@@ -63,6 +81,7 @@ int main(int argc, char** argv)
             }
         } else {
             wrong_input();
+            return -1;
         }
     } else {
         wrong_input();

@@ -1,11 +1,14 @@
+#pragma once
+
 #include "build.h"
+#include "globals.h"
 #include <efsw/efsw.hpp>
 #include <httplib.h>
 #include <string>
 
 class UpdateListener : public efsw::FileWatchListener {
 public:
-    std::string out_dir;
+    Options options;
 
     void handleFileAction(efsw::WatchID watchid, const std::string& dir,
         const std::string& filename, efsw::Action action,
@@ -19,5 +22,5 @@ private:
     httplib::Server web_server;
 
 public:
-    DevServer(std::string outdir);
+    DevServer(Options options);
 };

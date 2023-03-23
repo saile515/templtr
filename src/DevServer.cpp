@@ -1,5 +1,6 @@
 #include "DevServer.h"
 
+#include "globals.h"
 #include <efsw/efsw.hpp>
 #include <filesystem>
 #include <fmt/core.h>
@@ -9,23 +10,23 @@ void UpdateListener::handleFileAction(efsw::WatchID watchid, const std::string& 
     const std::string& filename, efsw::Action action,
     std::string oldFilename)
 {
-    build(out_dir);
+    build(options);
 }
 
-DevServer::DevServer(std::string out_dir)
+DevServer::DevServer(Options options)
 {
-    listener.out_dir = out_dir;
+    listener.options = options;
 
     for (const auto& sub_dir : std::filesystem::directory_iterator(std::filesystem::current_path().string())) {
         std::string sub_dir_name = sub_dir.path().stem().string();
-        if (sub_dir_name != out_dir) {
+        if (sub_dir_name != options.out_dir) {
             file_watcher.addWatch(sub_dir.path().string(), &listener, true);
         }
     }
 
     file_watcher.watch();
 
-    web_server.set_mount_point("/", out_dir);
+    web_server.set_mount_point("/", options.out_dir);
 
     fmt::print("Started dev server\n");
 
