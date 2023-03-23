@@ -20,7 +20,10 @@ jobs:
         run: |
           wget https://github.com/saile515/templtr/releases/download/v0.3.0/templtr-x64-linux.tar.gz
           tar -xvzf templtr-x64-linux.tar.gz
-      
+          
+      - name: List files
+        run: ls
+        
       - name: Build docs
         run: ./templtr build out
         
