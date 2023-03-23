@@ -1,0 +1,25 @@
+name: Build documentation
+
+on:
+  push:
+    branches: [ "master" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install wget
+        run: sudo apt-get update; sudo apt-get install wget
+
+      - name: Install templtr
+        run: |
+          wget https://github.com/saile515/templtr/releases/download/v0.3.0/templtr-x64-linux.tar.gz
+          tar –xvzf templtr-x64-linux.tar.gz
+      
+      - name: Build docs
+        run: templtr build out
