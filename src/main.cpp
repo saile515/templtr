@@ -1,14 +1,10 @@
 #include "DevServer.h"
 #include "build.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
-
+#include <chrono>
 #include <filesystem>
 #include <fmt/core.h>
+#include <thread>
 
 static void wrong_input()
 {
@@ -63,7 +59,7 @@ int main(int argc, char** argv)
             signal(SIGINT, exit);
 
             while (true) {
-                Sleep(1);
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         } else {
             wrong_input();
