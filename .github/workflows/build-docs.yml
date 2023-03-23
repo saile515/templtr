@@ -22,7 +22,7 @@ jobs:
           tar -xvzf templtr-x64-linux.tar.gz
         
       - name: Build docs
-        run: cd docs; ./templtr build out
+        run: cd docs; ../templtr build out
         
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
