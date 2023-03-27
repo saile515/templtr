@@ -4,6 +4,7 @@
 
 #include <fmt/core.h>
 #include <fstream>
+#include <maddy/parser.h>
 #include <re2/re2.h>
 #include <regex>
 #include <string>
@@ -21,7 +22,13 @@ std::string string_replace(const std::string& template_string, Json::Value::cons
         std::stringstream buffer;
         buffer << file.rdbuf();
         value = buffer.str();
-        re2::RE2::GlobalReplace(&value, "\r\n", "\n");
+        re2::RE2::GlobalReplace(&value, "\r\n", "\n\n");
+
+        if (re2::RE2::PartialMatch(file_match, "\\.md")) {
+            std::stringstream markdown_input(value);
+            std::shared_ptr<maddy::Parser> parser = std::make_shared<maddy::Parser>();
+            value = parser->Parse(markdown_input);
+        }
     }
     re2::RE2::GlobalReplace(&value, "\\\\", "\\\\\\\\");
 

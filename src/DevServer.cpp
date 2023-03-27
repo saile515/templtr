@@ -15,6 +15,8 @@ void UpdateListener::handleFileAction(efsw::WatchID watchid, const std::string& 
 
 DevServer::DevServer(Options options)
 {
+    build(options);
+
     listener.options = options;
 
     for (const auto& sub_dir : std::filesystem::directory_iterator(std::filesystem::current_path().string())) {

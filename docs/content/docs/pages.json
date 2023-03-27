@@ -2,5 +2,5 @@
 	"category": "Directories",
 	"title": "Pages",
 	"summary": "A page (template) is a base <code>.html</code> file for statically generated pages with dynamic or static content.",
-	"article": ":/content/pages.txt:"
+	"article": ":/content/pages.md:"
 }

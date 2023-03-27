@@ -2,5 +2,5 @@
 	"category": "Directories",
 	"title": "Components",
 	"summary": "Components are reusable html snippets that can be used in multiple templates.",
-	"article": ":/content/components.txt:"
+	"article": ":/content/components.md:"
 }

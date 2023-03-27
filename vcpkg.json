@@ -1,5 +1,5 @@
 {
 	"name": "templtr",
 	"version-string": "0.4.0",
-	"dependencies": ["fmt", "jsoncpp", "re2", "efsw", "cpp-httplib"]
+	"dependencies": ["fmt", "jsoncpp", "re2", "efsw", "cpp-httplib", "maddy"]
 }

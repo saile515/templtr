@@ -1,0 +1,6 @@
+{
+	"category": "Events",
+	"title": "wsListen",
+	"summary": "Update content on WebSocket messages.",
+	"article": ":/content/ws-listen.md:"
+}
