@@ -56,7 +56,7 @@ void build_page(std::string page_path, std::string tmpl)
         scripts_str += fmt::format("<script src='{}' async></script>", script);
     }
     re2::RE2::GlobalReplace(&scripts_str, "\\\\", "\\\\\\\\");
-    re2::RE2::GlobalReplace(&built_page, "</head>", fmt::format("{}</head>", scripts_str));
+    re2::RE2::GlobalReplace(&built_page, "<head>", fmt::format("<head>{}", scripts_str));
 
     // Write to file
     std::ofstream out_file(fmt::format("{}/index.html", Global::current_outdir));
