@@ -43,7 +43,7 @@ set(PRJ_LIBRARIES
     re2::re2
     efsw::efsw
     httplib::httplib
-    unofficial::maddy::maddy
+    discount::libmarkdown
 )
 
 # add dependency find_package calls and similar here
@@ -52,7 +52,7 @@ find_package(jsoncpp CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 find_package(efsw CONFIG REQUIRED)
 find_package(httplib CONFIG REQUIRED)
-find_package(unofficial-maddy CONFIG REQUIRED)
+find_package(discount CONFIG REQUIRED)
 
 ### END SETTINGS ###
 
