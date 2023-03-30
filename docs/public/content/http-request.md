@@ -24,5 +24,4 @@
 		"responseSelector": "#result"
 	}
 }
-
 ```

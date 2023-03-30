@@ -2,10 +2,6 @@ article {
 	margin: 2rem;
 }
 
-article.no-line-wrap {
-	white-space: normal;
-}
-
 article h1 {
 	border-bottom: 2px #d4d4d8 solid;
 	margin-bottom: 1rem;
@@ -35,4 +31,5 @@ article h4 {
 
 article pre > code {
 	width: 100%;
+	padding-top: 1em;
 }

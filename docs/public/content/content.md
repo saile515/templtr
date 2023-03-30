@@ -8,6 +8,6 @@ The homepage (`/`) can be created with a file in the root of the content directo
 
 The `.json` files should be populated with the dynamic properties in the template files. Property values can be strings, arrays, object, numbers, etc. String properties can also include html code.
 
-To embed a file, surround the filename (relative to the public directory) with colons.
-Example: `"content": ":/my-txt-file.txt:"`
+To embed a file, surround the file path (relative to the public directory) with colons. Markdown files are parsed to html.<br>
+Example: `"content": ":/my-txt-file.txt:"`<br>
 *Note: All UTF-8 file formats are supported. It doesn't have to be a `.txt` file.*
