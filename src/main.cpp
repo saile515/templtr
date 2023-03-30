@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fmt/core.h>
 #include <thread>
+#include <csignal>
 
 static void wrong_input()
 {

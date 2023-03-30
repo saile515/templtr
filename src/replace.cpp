@@ -31,14 +31,14 @@ std::string string_replace(const std::string& template_string, Json::Value::cons
         if (re2::RE2::PartialMatch(file_match, "\\.md")) {
             std::string tmp_file_path = fmt::format("{}/md.html", Global::current_outdir);
             FILE* html_out = fopen(tmp_file_path.c_str(), "w");
-            MMIOT* mkd_input = mkd_string(value.c_str(), value.size(), 0);
-            markdown(mkd_input, html_out, 0);
+            MMIOT* mkd_input = mkd_string(value.c_str(), value.size(), MKD_FENCEDCODE);
+            markdown(mkd_input, html_out, MKD_FENCEDCODE);
             fclose(html_out);
             std::ifstream tmp_file(tmp_file_path, std::ifstream::binary);
             std::stringstream tmp_buffer;
             tmp_buffer << tmp_file.rdbuf();
             value = tmp_buffer.str();
-            std::filesystem::remove(tmp_file_path);
+            remove(tmp_file_path.c_str());
         }
     }
     re2::RE2::GlobalReplace(&value, "\\\\", "\\\\\\\\");
