@@ -2,5 +2,5 @@
 	"category": "Directories",
 	"title": "Content",
 	"summary": "The content directory is in charge of routing and storing dynamic and static content.",
-	"article": ":/content/content.txt:"
+	"article": ":/content/content.md:"
 }

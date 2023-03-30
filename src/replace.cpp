@@ -1,9 +1,14 @@
 #include "replace.h"
 
 #include "events.h"
+#include "globals.h"
 
+#include <filesystem>
 #include <fmt/core.h>
 #include <fstream>
+extern "C" {
+#include <mkdio.h>
+}
 #include <re2/re2.h>
 #include <regex>
 #include <string>
@@ -22,6 +27,19 @@ std::string string_replace(const std::string& template_string, Json::Value::cons
         buffer << file.rdbuf();
         value = buffer.str();
         re2::RE2::GlobalReplace(&value, "\r\n", "\n");
+
+        if (re2::RE2::PartialMatch(file_match, "\\.md")) {
+            std::string tmp_file_path = fmt::format("{}/md.html", Global::current_outdir);
+            FILE* html_out = fopen(tmp_file_path.c_str(), "w");
+            MMIOT* mkd_input = mkd_string(value.c_str(), value.size(), MKD_FENCEDCODE);
+            markdown(mkd_input, html_out, MKD_FENCEDCODE);
+            fclose(html_out);
+            std::ifstream tmp_file(tmp_file_path, std::ifstream::binary);
+            std::stringstream tmp_buffer;
+            tmp_buffer << tmp_file.rdbuf();
+            value = tmp_buffer.str();
+            remove(tmp_file_path.c_str());
+        }
     }
     re2::RE2::GlobalReplace(&value, "\\\\", "\\\\\\\\");
 

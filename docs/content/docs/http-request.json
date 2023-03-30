@@ -1,0 +1,6 @@
+{
+	"category": "Events",
+	"title": "httpRequest",
+	"summary": "Make http requests without code.",
+	"article": ":/content/http-request.md:"
+}
