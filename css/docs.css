@@ -1,0 +1,35 @@
+article {
+	margin: 2rem;
+}
+
+article h1 {
+	border-bottom: 2px #d4d4d8 solid;
+	margin-bottom: 1rem;
+	padding-bottom: 0.25rem;
+	font-size: 1.75rem;
+}
+
+article .content p {
+	margin-bottom: 1rem;
+}
+
+article .category {
+	font-weight: bold;
+	color: #0e7490;
+}
+
+article .summary {
+	font-style: italic;
+	font-size: 1.125rem;
+}
+
+article h2,
+article h3,
+article h4 {
+	margin-top: 1rem;
+}
+
+article pre > code {
+	width: 100%;
+	padding-top: 1em;
+}

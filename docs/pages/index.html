@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="stylesheet" href="/css/docs.css" /><link rel="stylesheet" href="/css/main.css" /><script src="/js/nav.js" async></script><title>Pages - templtr docs</title><base href="/templtr"/></head><body><div id="root-container"><div id="navbar"><div class="nav-topbar"><h2>templtr documentation</h2><button id="open-nav" onclick="toggleNav()" aria-label="Open navigation"></button></div><nav><div id="close-nav" onclick="toggleNav()"></div><ul><li><a href="/">Start</a></li><hr /><p class="category">Directories</p><li><a href="/docs/pages/">Pages</a></li><li><a href="/docs/content/">Content</a></li><li><a href="/docs/components/">Components</a></li><li><a href="/docs/public/">Public</a></li><hr />            <p class="category">Events</p>            <li><a href="/docs/events/">Events</a></li>            <li><a href="/docs/http-request/">httpRequest</a></li>            <li><a href="/docs/ws-listen/">wsListen</a></li></ul></nav></div><div class="filler"></div><article><p class="category">Directories</p><h1>Pages</h1><p class="summary">A page (template) is a base <code>.html</code> file for statically generated pages with dynamic or static content.</p><br /><div class="content"><p><code>/pages</code> is where all html templates are stored. Template files are similar to <code>.html</code> files, including the file extension. They do however slightly differ in the file contents.</p>
+
+<p>Pages that will only have a single instance should be named for example <code>page.html</code>. Pages with multiple routes should named for example <code>[page].html</code> (the square brackets tells templtr that the page is dynamic).</p>
+
+<p>To include dynamic content in your template, surround a property name with curly brackets.<br>
+Example: <code>Pages</code> will be replaced by the title property in their respective json file.</p>
+
+<p>To include a list of dynamic content, surround an html node with square brackets, and include the property name somewhere within the node.<br>
+Example: <code>[&lt;li&gt;{list}&lt;/li&gt;]</code> will create an entry for every item within the list property.</p>
+
+<p>To include an object, simply write the path to the object, like you would in JavaScript and other languages' objects.<br>
+Example: <code>{object.name}</code> will be replaced by the name sub-property of the object root-property.</p>
+
+<p>To include a component, write the name of the component within a closed html start-tag.<br>
+Example: <code>&lt;navbar /&gt;</code> will be replaced by the content of the navbar component.</p>
+
+<p>These features can be combined. You can have objects within an array in order to create lists with multiple dynamic properties.</p>
+</div></article></div></body></html>

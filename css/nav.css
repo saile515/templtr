@@ -1,0 +1,100 @@
+#navbar {
+	background-color: #f4f4f5;
+	padding: 2rem;
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	align-self: start;
+	width: 100%;
+}
+
+#navbar .nav-topbar {
+	width: 100%;
+}
+
+#navbar h2 {
+	font-size: 1.25rem;
+	display: inline;
+}
+
+#navbar nav ul {
+	padding: 0;
+	list-style: none;
+}
+
+#navbar nav ul li {
+	margin: 0.25rem 0;
+}
+
+#navbar .category {
+	font-weight: bold;
+	font-size: 1.125rem;
+	margin: 0.5rem 0;
+}
+
+#navbar a {
+	color: #27272a;
+	text-decoration: none;
+}
+
+#open-nav {
+	display: none;
+	float: right;
+	width: 2rem;
+	height: 2rem;
+	background-color: none;
+	border: none;
+	background-image: url("/icons/menu.svg");
+}
+
+#close-nav {
+	display: none;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.filler {
+	display: none;
+}
+
+@media screen and (max-width: 768px) {
+	#navbar {
+		position: fixed;
+		padding: 0.5rem;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: min-content;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#navbar nav {
+		display: none;
+	}
+
+	#navbar nav.open {
+		display: block;
+	}
+
+	#navbar nav ul {
+		z-index: 10;
+		position: relative;
+	}
+
+	#open-nav {
+		display: block;
+	}
+
+	#close-nav {
+		display: block;
+	}
+
+	.filler {
+		display: block;
+		height: 3rem;
+	}
+}
