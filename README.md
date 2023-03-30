@@ -28,14 +28,14 @@ Run `templtr init` in the project root to create a templtr project.
 ### Build the project:
 Run `templtr build`
 **Options:**
-`-o` sets the out directory, default is `/out`
-`-b` sets the base url of links, default is an empty string
+* `-o` sets the out directory, default is `/out`
+* `-b` sets the base url of links, default is an empty string
 
 ### Start dev server:
 Run `templtr dev`
 **Options:**
-`-o` sets the out directory, default is `/out`
-`-b` sets the base url of links, default is an empty string
+* `-o` sets the out directory, default is `/out`
+* `-b` sets the base url of links, default is an empty string
 
 ## Documentation
 Documentation for templtr is available at [saile515.github.io/templtr](https://saile515.github.io/templtr/)
